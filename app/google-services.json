@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "681868721074",
+    "project_id": "meeters2",
+    "storage_bucket": "meeters2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:681868721074:android:e07427fe2c0ff6eef502ab",
+        "android_client_info": {
+          "package_name": "com.example.meeters2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_f2pyYa1swHVjvaxuuYsk1owzewhi-8c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

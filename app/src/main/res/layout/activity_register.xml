@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/meeters_purple">
+
+    <!-- App Logo and Title Section -->
+    <LinearLayout
+        android:id="@+id/headerSection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:layout_marginTop="48dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Meeters"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_gravity="center"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Match. Meet. Connect."
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:layout_gravity="center"
+            android:layout_marginTop="4dp"/>
+    </LinearLayout>
+
+    <!-- Back Button -->
+    <TextView
+        android:id="@+id/backToLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/headerSection"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:drawableStart="@drawable/ic_back_arrow"
+        android:drawablePadding="8dp"
+        android:text="Back to Log in"
+        android:textColor="@color/white"
+        android:textSize="16sp"/>
+
+    <!-- Registration Form Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/backToLogin"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/rounded_top_background"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign Up"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <EditText
+                android:id="@+id/firstNameEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/rounded_edit_text"
+                android:hint="First Name"
+                android:inputType="textPersonName"
+                android:padding="16dp"
+                android:textColor="@color/black"
+                android:textColorHint="@color/black_50_translucent"/>
+
+            <EditText
+                android:id="@+id/lastNameEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/rounded_edit_text"
+                android:hint="Last Name"
+                android:inputType="textPersonName"
+                android:padding="16dp"
+                android:textColor="@color/black"
+                android:textColorHint="@color/black_50_translucent"/>
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/emailEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_edit_text"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:padding="16dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/black_50_translucent"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/passwordEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_edit_text"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:padding="16dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/black_50_translucent"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/confirmPasswordEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_edit_text"
+            android:hint="Confirm Password"
+            android:inputType="textPassword"
+            android:padding="16dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/black_50_translucent"
+            android:layout_marginBottom="24dp"/>
+
+        <Button
+            android:id="@+id/registerButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_button"
+            android:text="Sign Up"
+            android:textColor="@color/white"
+            android:padding="16dp"
+            android:textAllCaps="false"/>
+    </LinearLayout>
+</RelativeLayout> 
