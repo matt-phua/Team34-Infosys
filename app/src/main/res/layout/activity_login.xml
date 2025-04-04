@@ -40,7 +40,7 @@
         android:layout_below="@id/headerSection"
         android:layout_marginStart="24dp"
         android:layout_marginTop="48dp"
-        android:text="Hello!"
+        android:text="Let's Find Meeters!"
         android:textColor="@color/white"
         android:textSize="32sp"
         android:textStyle="bold"/>
