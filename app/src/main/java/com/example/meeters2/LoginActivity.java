@@ -2,6 +2,8 @@ package com.example.meeters2;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -41,6 +43,36 @@ public class LoginActivity extends AppCompatActivity {
             finish();
         }
 
+        // Set initial button state
+        updateLoginButtonState();
+
+        // Add text change listeners
+        emailEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updateLoginButtonState();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        passwordEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updateLoginButtonState();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
         // Set click listener for login button
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,6 +106,7 @@ public class LoginActivity extends AppCompatActivity {
                         // Reset button state
                         loginButton.setEnabled(true);
                         loginButton.setText("Login");
+                        updateLoginButtonState();
                     });
             }
         });
@@ -86,5 +119,26 @@ public class LoginActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    private void updateLoginButtonState() {
+        String email = emailEditText.getText().toString().trim();
+        String password = passwordEditText.getText().toString().trim();
+
+        boolean isValid = isValidEmail(email) && isValidPassword(password);
+
+        if (isValid) {
+            loginButton.setBackgroundResource(R.drawable.rounded_button_active);
+        } else {
+            loginButton.setBackgroundResource(R.drawable.rounded_button);
+        }
+    }
+
+    private boolean isValidEmail(String email) {
+        return !email.isEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
+    private boolean isValidPassword(String password) {
+        return !password.isEmpty() && password.length() >= 6;
     }
 } 
