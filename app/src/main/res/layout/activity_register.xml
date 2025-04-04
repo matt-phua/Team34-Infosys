@@ -17,8 +17,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Meeters"
+            android:fontFamily="@font/pacifico_regular"
             android:textColor="@color/white"
-            android:textSize="24sp"
+            android:textSize="42sp"
             android:textStyle="bold"
             android:layout_gravity="center"/>
 
@@ -26,8 +27,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Match. Meet. Connect."
+            android:fontFamily="@font/pacifico_regular"
             android:textColor="@color/white"
-            android:textSize="14sp"
+            android:textSize="18sp"
             android:layout_gravity="center"
             android:layout_marginTop="4dp"/>
     </LinearLayout>

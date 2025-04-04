@@ -2,6 +2,8 @@ package com.example.meeters2;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -40,6 +42,29 @@ public class RegisterActivity extends AppCompatActivity {
         confirmPasswordEditText = findViewById(R.id.confirmPasswordEditText);
         registerButton = findViewById(R.id.registerButton);
         backToLogin = findViewById(R.id.backToLogin);
+
+        // Set initial button state
+        updateRegisterButtonState();
+
+        // Add text change listeners
+        TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updateRegisterButtonState();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        };
+
+        firstNameEditText.addTextChangedListener(textWatcher);
+        lastNameEditText.addTextChangedListener(textWatcher);
+        emailEditText.addTextChangedListener(textWatcher);
+        passwordEditText.addTextChangedListener(textWatcher);
+        confirmPasswordEditText.addTextChangedListener(textWatcher);
 
         // Set click listener for register button
         registerButton.setOnClickListener(new View.OnClickListener() {
@@ -107,6 +132,7 @@ public class RegisterActivity extends AppCompatActivity {
                         // Reset button state
                         registerButton.setEnabled(true);
                         registerButton.setText("Sign Up");
+                        updateRegisterButtonState();
                     });
             }
         });
@@ -119,5 +145,31 @@ public class RegisterActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    private void updateRegisterButtonState() {
+        String firstName = firstNameEditText.getText().toString().trim();
+        String lastName = lastNameEditText.getText().toString().trim();
+        String email = emailEditText.getText().toString().trim();
+        String password = passwordEditText.getText().toString().trim();
+        String confirmPassword = confirmPasswordEditText.getText().toString().trim();
+
+        boolean isValid = !firstName.isEmpty() && !lastName.isEmpty() && 
+                         isValidEmail(email) && isValidPassword(password) && 
+                         password.equals(confirmPassword);
+
+        if (isValid) {
+            registerButton.setBackgroundResource(R.drawable.rounded_button_active);
+        } else {
+            registerButton.setBackgroundResource(R.drawable.rounded_button);
+        }
+    }
+
+    private boolean isValidEmail(String email) {
+        return !email.isEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
+    private boolean isValidPassword(String password) {
+        return !password.isEmpty() && password.length() >= 6;
     }
 } 
