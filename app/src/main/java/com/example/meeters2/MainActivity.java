@@ -14,8 +14,6 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -46,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView welcomeText;              // Shows welcome message with user's name
     private ImageView profileImage;            // User's profile picture
     private ImageButton logoutButton;          // Logout button
+    private ImageButton notificationButton;          // Notification button
     private RecyclerView upcomingEventsRecyclerView;    // List of upcoming events
     private RecyclerView suggestedMatchesRecyclerView;  // List of suggested matches
     private BottomNavigationView bottomNavigation;      // Bottom navigation bar
@@ -100,7 +99,22 @@ public class MainActivity extends AppCompatActivity {
 
         // Set up logout button click listener
         setupLogoutButton();
+        // Set an OnClickListener to handle the button click
+        notificationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Intent to launch NotificationActivity when the button is clicked
+                Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
+
+    // Find the ImageButton for notifications
+
+
+
 
     /**
      * Initialize all UI components by finding them in the layout
@@ -109,10 +123,13 @@ public class MainActivity extends AppCompatActivity {
         welcomeText = findViewById(R.id.welcomeText);
         profileImage = findViewById(R.id.profileImage);
         logoutButton = findViewById(R.id.logoutButton);
+        notificationButton = findViewById(R.id.notificationsButton);
         upcomingEventsRecyclerView = findViewById(R.id.upcomingEventsRecyclerView);
         suggestedMatchesRecyclerView = findViewById(R.id.suggestedMatchesRecyclerView);
         bottomNavigation = findViewById(R.id.bottomNavigation);
     }
+
+
 
     /**
      * Set up the toolbar with custom styling
@@ -204,12 +221,15 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 } else if (itemId == R.id.navigation_events) {
                     // TODO: Navigate to Events screen
+
                     return true;
                 } else if (itemId == R.id.navigation_messages) {
                     // TODO: Navigate to Messages screen
                     return true;
                 } else if (itemId == R.id.navigation_profile) {
                     // TODO: Navigate to Profile screen
+                    Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                    startActivity(intent);
                     return true;
                 }
                 return false;
