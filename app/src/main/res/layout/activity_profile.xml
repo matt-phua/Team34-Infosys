@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Main container using CoordinatorLayout for advanced scrolling behavior -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
-
     <!-- App Bar Section - Contains the toolbar with profile and notifications -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/meeters_purple">
+        android:background="@color/meeters_purple"
+        app:layout_scrollFlags="scroll|enterAlways">
 
         <!-- Toolbar - Custom toolbar with profile image, welcome text, and notifications -->
         <androidx.appcompat.widget.Toolbar
@@ -49,7 +48,7 @@
 
                 <!-- Notifications button -->
                 <ImageButton
-                    android:id="@+id/notificationsButton"
+                    android:id="@+id/notificationButton"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
@@ -75,66 +74,116 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- Vertical layout for all content sections -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="24dp">
 
-            <!-- Search Bar Section -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+            <!-- Profile Image -->
+            <ImageView
+                android:id="@+id/profile_image"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:layout_marginBottom="16dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                app:boxCornerRadiusTopStart="25dp"
-                app:boxCornerRadiusTopEnd="25dp"
-                app:boxCornerRadiusBottomStart="25dp"
-                app:boxCornerRadiusBottomEnd="25dp">
+                android:background="@drawable/circle_background"
+                android:padding="2dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_launcher_foreground" />
 
-                <!-- Search input field with search icon -->
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
+            <!-- Name and Toggle Button -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <!-- Name -->
+
+                <!-- Toggle Button -->
+
+                <TextView
+                    android:id="@+id/profile_name"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:hint="Search events or people"
-                    android:drawableStart="@drawable/ic_search"
-                    android:drawablePadding="8dp"
-                    android:padding="16dp"/>
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_marginEnd="16dp"
+                    android:text="Alex Johnson"
+                    android:textColor="#000000"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
-            <!-- Upcoming Events Section -->
+                <ToggleButton
+                    android:id="@+id/meetings_toggle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:checked="false"
+                    android:textOff="Not Meeting"
+                    android:textOn="Meeting" />
+
+            </LinearLayout>
+
+            <!-- Email -->
+            <TextView
+                android:id="@+id/profile_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:text="alex.johnson@example.com"
+                android:textColor="#666666"
+                android:textSize="16sp" />
+
+            <!-- About Me -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Upcoming Events"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="8dp"
+                android:text="About Me"
+                android:textColor="#333333"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
-            <!-- Horizontal scrolling list of upcoming events -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/upcomingEventsRecyclerView"
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"/>
+                android:text="Software engineer with a passion for mobile development, open-source contribution, and UI design. Enjoys hiking and photography in free time."
+                android:textColor="#444444"
+                android:textSize="16sp" />
 
-            <!-- Suggested Matches Section -->
+            <!-- Friend Section with Border -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp" />
+
+            <!-- Friend Text -->
             <TextView
+                android:id="@+id/friends_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Suggested Matches"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginEnd="12dp"
+                android:text="Friends"
+                android:textColor="#000000"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-            <!-- Horizontal scrolling list of suggested matches -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/suggestedMatchesRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+            <!-- Number of Friends -->
+            <TextView
+                android:id="@+id/number_of_friends"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="123"
+                android:textColor="#4CAF50"
+                android:textSize="16sp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+
 
     <!-- Bottom Navigation Bar -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -142,8 +191,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        app:menu="@menu/bottom_navigation_menu"
         app:itemIconTint="@color/bottom_nav_colors"
-        app:itemTextColor="@color/bottom_nav_colors"/>
+        app:itemTextColor="@color/bottom_nav_colors"
+        app:menu="@menu/bottom_navigation_menu" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout> 
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
