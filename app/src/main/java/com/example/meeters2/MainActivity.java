@@ -154,6 +154,8 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        //asks user for location permission
+        checkLocationPermission();
 
 
         // Update welcome text with user's email
@@ -255,7 +257,6 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
-        //asks user for location permission
-        checkLocationPermission();
+
     }
 }
