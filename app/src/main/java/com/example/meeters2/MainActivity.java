@@ -1,5 +1,10 @@
 package com.example.meeters2;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import android.util.Log;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -27,19 +32,38 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
+import android.location.Location;
+
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.FieldValue;
+
+import org.imperiumlabs.geofirestore.GeoFirestore;
+import org.imperiumlabs.geofirestore.callbacks.GeoQueryDataEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.CollectionReference;
+
+import com.google.firebase.messaging.FirebaseMessaging;
+
 /**
-  MainActivity - The home screen of the app
-  This activity shows:
-  1. User profile and notifications in the app bar
-  2. A search bar for finding events/people
-  3. Upcoming events in a horizontal scrolling list
-  4. Suggested matches in a horizontal scrolling list
-  5. Bottom navigation for accessing different sections of the app
+ MainActivity - The home screen of the app
+ This activity shows:
+ 1. User profile and notifications in the app bar
+ 2. A search bar for finding events/people
+ 3. Upcoming events in a horizontal scrolling list
+ 4. Suggested matches in a horizontal scrolling list
+ 5. Bottom navigation for accessing different sections of the app
  */
 public class MainActivity extends AppCompatActivity {
+    private List<NearbyUser> nearbyUsers = new ArrayList<>();
+    private NearbyUserAdapter nearbyUserAdapter;
     // Firebase authentication instance
     private FirebaseAuth mAuth;
-    
+
     // UI Components
     private TextView welcomeText;              // Shows welcome message with user's name
     private ImageView profileImage;            // User's profile picture
@@ -51,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
 
     //request real time location
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
-
     private void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -76,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +112,9 @@ public class MainActivity extends AppCompatActivity {
         initializeViews();
 
         setupToolbar();
+
+        //asks user for location permission
+        checkLocationPermission();
 
         // Check if user is signed in, if not redirect to login
         checkUserAuthentication();
@@ -154,19 +181,73 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        //asks user for location permission
-        checkLocationPermission();
-
 
         // Update welcome text with user's email
         welcomeText.setText("Welcome, " + currentUser.getEmail() + "!");
+
+        // Store FCM token in Firestore after login
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        String token = task.getResult();
+                        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                        FirebaseFirestore.getInstance()
+                                .collection("users")
+                                .document(uid)
+                                .update("fcmToken", token);
+                    }
+                });
 
         // Update welcome text with user's name (using email username)
         String email = currentUser.getEmail();
         String displayName = email != null ? email.split("@")[0] : "User";
         welcomeText.setText("Hello, " + displayName);
+
+
     }
 
+    private void findNearbyUsers(Location currentLocation) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference usersRef = db.collection("users");
+
+        GeoFirestore geoFirestore = new GeoFirestore(usersRef);
+
+        GeoPoint center = new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
+
+        geoFirestore.queryAtLocation(center, 1.0) // Radius in km
+                .addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
+                    @Override
+                    public void onDocumentEntered(DocumentSnapshot documentSnapshot, GeoPoint location) {
+                        Log.d("Nearby", "User found: " + documentSnapshot.getId());
+
+                        // 🔥 You can display these users on the map or in a list
+                        String name = documentSnapshot.getString("firstName") + " " + documentSnapshot.getString("lastName");
+                        NearbyUser user = new NearbyUser(documentSnapshot.getId(), name);
+
+                        //Avoid duplicates
+                        boolean exists = false;
+                        for (NearbyUser u : nearbyUsers) {
+                            if (u.getId().equals(user.getId())) {
+                                exists = true;
+                                break;
+                            }
+                        }
+                        if (!exists) {
+                            nearbyUsers.add(user);
+                            nearbyUserAdapter.notifyDataSetChanged();
+                        }
+                    }
+
+                    @Override public void onDocumentExited(DocumentSnapshot documentSnapshot) {}
+                    @Override public void onDocumentMoved(DocumentSnapshot documentSnapshot, GeoPoint location) {}
+                    @Override public void onDocumentChanged(DocumentSnapshot documentSnapshot, GeoPoint location) {}
+                    @Override public void onGeoQueryReady() {}
+                    @Override public void onGeoQueryError(Exception exception) {
+                        Log.e("GeoFirestore", "GeoQuery Error", exception);
+                    }
+                });
+    }
 
     private void setupRecyclerViews() {
         // Set up horizontal layout managers for both RecyclerViews
@@ -176,7 +257,8 @@ public class MainActivity extends AppCompatActivity {
         // TODO: Set up proper adapters with real data
         // For now, just set empty adapters
         setupEmptyAdapter(upcomingEventsRecyclerView);
-        setupEmptyAdapter(suggestedMatchesRecyclerView);
+        nearbyUserAdapter = new NearbyUserAdapter(nearbyUsers);
+        suggestedMatchesRecyclerView.setAdapter(nearbyUserAdapter);
     }
 
     /**
@@ -217,7 +299,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
-                
+
                 if (itemId == R.id.navigation_home) {
                     // If already on home
                     return true;
@@ -249,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Sign out the user
                 mAuth.signOut();
-                
+
                 // Redirect to login screen
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -260,3 +342,4 @@ public class MainActivity extends AppCompatActivity {
 
     }
 }
+
