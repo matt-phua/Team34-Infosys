@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 import android.widget.Toast;
-import android.view.View;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FieldValue;
@@ -65,22 +64,37 @@ public class NearbyUserAdapter extends RecyclerView.Adapter<NearbyUserAdapter.Vi
                         String receiverId = user.getId();
                         String senderId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-                        Map<String, Object> request = new HashMap<>();
-                        request.put("timestamp", FieldValue.serverTimestamp());
-                        request.put("status", "pending");
-                        request.put("message", message);
-
                         FirebaseFirestore.getInstance()
-                                .collection("requests")
-                                .document(receiverId)
-                                .collection("incoming")
+                                .collection("users")
                                 .document(senderId)
-                                .set(request)
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(v.getContext(), "Request sent!", Toast.LENGTH_SHORT).show();
+                                .get()
+                                .addOnSuccessListener(documentSnapshot -> {
+                                    if (documentSnapshot.exists()) {
+                                        String senderName = documentSnapshot.getString("firstName") + " " +
+                                                documentSnapshot.getString("lastName");
+
+                                        Map<String, Object> request = new HashMap<>();
+                                        request.put("timestamp", FieldValue.serverTimestamp());
+                                        request.put("status", "pending");
+                                        request.put("message", message);
+                                        request.put("senderName", senderName);
+
+                                        FirebaseFirestore.getInstance()
+                                                .collection("requests")
+                                                .document(receiverId)
+                                                .collection("incoming")
+                                                .document(senderId)
+                                                .set(request)
+                                                .addOnSuccessListener(aVoid -> {
+                                                    Toast.makeText(v.getContext(), "Request sent!", Toast.LENGTH_SHORT).show();
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Toast.makeText(v.getContext(), "Failed to send request.", Toast.LENGTH_SHORT).show();
+                                                });
+                                    }
                                 })
                                 .addOnFailureListener(e -> {
-                                    Toast.makeText(v.getContext(), "Failed to send request.", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(v.getContext(), "Could not retrieve sender name", Toast.LENGTH_SHORT).show();
                                 });
 
                     })
