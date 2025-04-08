@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
@@ -12,6 +13,7 @@ import android.view.View;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FieldValue;
+import androidx.appcompat.app.AlertDialog;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,26 +49,45 @@ public class NearbyUserAdapter extends RecyclerView.Adapter<NearbyUserAdapter.Vi
 
         // Handle click to send request
         holder.itemView.setOnClickListener(v -> {
-            String receiverId = user.getId();
-            String senderId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+            View dialogView = LayoutInflater.from(v.getContext()).inflate(R.layout.dialog_send_request, null);
+            EditText messageInput = dialogView.findViewById(R.id.requestMessageEditText);
 
-            Map<String, Object> request = new HashMap<>();
-            request.put("timestamp", FieldValue.serverTimestamp());
-            request.put("status", "pending");
+            builder.setView(dialogView)
+                    .setTitle("Send Meeting Request")
+                    .setPositiveButton("Send", (dialog, which) -> {
+                        String message = messageInput.getText().toString().trim();
+                        if (message.isEmpty()) {
+                            Toast.makeText(v.getContext(), "Message cannot be empty", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
-            FirebaseFirestore.getInstance()
-                    .collection("requests")
-                    .document(receiverId)
-                    .collection("incoming")
-                    .document(senderId)
-                    .set(request)
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(v.getContext(), "Meeting request sent!", Toast.LENGTH_SHORT).show();
+                        String receiverId = user.getId();
+                        String senderId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                        Map<String, Object> request = new HashMap<>();
+                        request.put("timestamp", FieldValue.serverTimestamp());
+                        request.put("status", "pending");
+                        request.put("message", message);
+
+                        FirebaseFirestore.getInstance()
+                                .collection("requests")
+                                .document(receiverId)
+                                .collection("incoming")
+                                .document(senderId)
+                                .set(request)
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(v.getContext(), "Request sent!", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(v.getContext(), "Failed to send request.", Toast.LENGTH_SHORT).show();
+                                });
+
                     })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(v.getContext(), "Failed to send request.", Toast.LENGTH_SHORT).show();
-                    });
+                    .setNegativeButton("Cancel", null)
+                    .show();
         });
+
     }
 
     @Override

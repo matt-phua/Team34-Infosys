@@ -151,7 +151,6 @@ public class MainActivity extends AppCompatActivity {
         profileImage = findViewById(R.id.profileImage);
         logoutButton = findViewById(R.id.logoutButton);
         notificationButton = findViewById(R.id.notificationsButton);
-        upcomingEventsRecyclerView = findViewById(R.id.upcomingEventsRecyclerView);
         suggestedMatchesRecyclerView = findViewById(R.id.suggestedMatchesRecyclerView);
         bottomNavigation = findViewById(R.id.bottomNavigation);
     }
@@ -204,6 +203,34 @@ public class MainActivity extends AppCompatActivity {
         String displayName = email != null ? email.split("@")[0] : "User";
         welcomeText.setText("Hello, " + displayName);
 
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+
+            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+            fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+                if (location != null) {
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+
+                    Map<String, Object> locationUpdate = new HashMap<>();
+                    locationUpdate.put("location", geoPoint);
+                    locationUpdate.put("timestamp", FieldValue.serverTimestamp());
+
+                    db.collection("users").document(currentUser.getUid())
+                            .update(locationUpdate)
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(MainActivity.this, "Location updated!", Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(MainActivity.this, "Failed to update location", Toast.LENGTH_SHORT).show();
+                            });
+
+                    // query for nearby users
+                    findNearbyUsers(location);
+                }
+            });
+        }
 
     }
 
@@ -251,12 +278,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupRecyclerViews() {
         // Set up horizontal layout managers for both RecyclerViews
-        upcomingEventsRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        suggestedMatchesRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        suggestedMatchesRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
         // TODO: Set up proper adapters with real data
-        // For now, just set empty adapters
-        setupEmptyAdapter(upcomingEventsRecyclerView);
         nearbyUserAdapter = new NearbyUserAdapter(nearbyUsers);
         suggestedMatchesRecyclerView.setAdapter(nearbyUserAdapter);
     }
@@ -306,9 +330,6 @@ public class MainActivity extends AppCompatActivity {
                 } else if (itemId == R.id.navigation_events) {
                     // TODO: Navigate to Events screen
 
-                    return true;
-                } else if (itemId == R.id.navigation_messages) {
-                    // TODO: Navigate to Messages screen
                     return true;
                 } else if (itemId == R.id.navigation_profile) {
                     // TODO: Navigate to Profile screen

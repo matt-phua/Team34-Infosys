@@ -103,22 +103,6 @@
                     android:padding="16dp"/>
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Upcoming Events Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Upcoming Events"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="16dp"/>
-
-            <!-- Horizontal scrolling list of upcoming events -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/upcomingEventsRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"/>
-
             <!-- Suggested Matches Section -->
             <TextView
                 android:layout_width="wrap_content"
@@ -128,11 +112,14 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="16dp"/>
 
-            <!-- Horizontal scrolling list of suggested matches -->
+            <!-- Vertical scrolling list of suggested matches -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/suggestedMatchesRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:clipToPadding="false"
+                android:padding="4dp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
