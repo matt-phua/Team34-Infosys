@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
                     GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
 
                     Map<String, Object> locationUpdate = new HashMap<>();
-                    locationUpdate.put("location", geoPoint);
+                    locationUpdate.put("g", geoPoint); // 'g' is the default location field GeoFirestore expects
                     locationUpdate.put("timestamp", FieldValue.serverTimestamp());
 
                     db.collection("users").document(currentUser.getUid())
@@ -246,15 +246,22 @@ public class MainActivity extends AppCompatActivity {
 
         GeoPoint center = new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
 
-        geoFirestore.queryAtLocation(center, 1.0) // Radius in km
+        geoFirestore.queryAtLocation(center, 10.0) // Radius in km
                 .addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
                     @Override
                     public void onDocumentEntered(DocumentSnapshot documentSnapshot, GeoPoint location) {
                         Log.d("Nearby", "User found: " + documentSnapshot.getId());
 
-                        // 🔥 You can display these users on the map or in a list
+                        //Display users on in a list
+                        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                        String senderId = documentSnapshot.getId();
+
+                        // Skip if this is the current user
+                        if (documentSnapshot.getId().equals(currentUserId)) return;
+
                         String name = documentSnapshot.getString("firstName") + " " + documentSnapshot.getString("lastName");
-                        NearbyUser user = new NearbyUser(documentSnapshot.getId(), name);
+                        NearbyUser user = new NearbyUser(senderId, name);
+
 
                         //Avoid duplicates
                         boolean exists = false;
