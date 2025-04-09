@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
     //request real time location
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
+
     private void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -98,12 +99,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
 
         // Initialize Firebase Auth for user authentication
         mAuth = FirebaseAuth.getInstance();
@@ -113,6 +116,9 @@ public class MainActivity extends AppCompatActivity {
 
         setupToolbar();
 
+        bottomNavigation.setSelectedItemId(R.id.navigation_home); // highlight HOME tab
+
+
         //asks user for location permission
         checkLocationPermission();
 
@@ -121,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
         // RecyclerViews for events and matches
         setupRecyclerViews();
+
 
         setupBottomNavigation();
 
@@ -141,8 +148,6 @@ public class MainActivity extends AppCompatActivity {
     // Find the ImageButton for notifications
 
 
-
-
     /**
      * Initialize all UI components by finding them in the layout
      */
@@ -154,7 +159,6 @@ public class MainActivity extends AppCompatActivity {
         suggestedMatchesRecyclerView = findViewById(R.id.suggestedMatchesRecyclerView);
         bottomNavigation = findViewById(R.id.bottomNavigation);
     }
-
 
 
     /**
@@ -266,11 +270,24 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
 
-                    @Override public void onDocumentExited(DocumentSnapshot documentSnapshot) {}
-                    @Override public void onDocumentMoved(DocumentSnapshot documentSnapshot, GeoPoint location) {}
-                    @Override public void onDocumentChanged(DocumentSnapshot documentSnapshot, GeoPoint location) {}
-                    @Override public void onGeoQueryReady() {}
-                    @Override public void onGeoQueryError(Exception exception) {
+                    @Override
+                    public void onDocumentExited(DocumentSnapshot documentSnapshot) {
+                    }
+
+                    @Override
+                    public void onDocumentMoved(DocumentSnapshot documentSnapshot, GeoPoint location) {
+                    }
+
+                    @Override
+                    public void onDocumentChanged(DocumentSnapshot documentSnapshot, GeoPoint location) {
+                    }
+
+                    @Override
+                    public void onGeoQueryReady() {
+                    }
+
+                    @Override
+                    public void onGeoQueryError(Exception exception) {
                         Log.e("GeoFirestore", "GeoQuery Error", exception);
                     }
                 });
@@ -297,7 +314,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onBindViewHolder(@NonNull EmptyViewHolder holder, int position) {}
+            public void onBindViewHolder(@NonNull EmptyViewHolder holder, int position) {
+            }
 
             @Override
             public int getItemCount() {
@@ -319,20 +337,20 @@ public class MainActivity extends AppCompatActivity {
      * Set up the bottom navigation with click listeners
      */
     private void setupBottomNavigation() {
+        bottomNavigation.setSelectedItemId(R.id.navigation_home); // highlight HOME tab
+
         bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
 
                 if (itemId == R.id.navigation_home) {
-                    // If already on home
-                    return true;
+                    return true; // already on home
                 } else if (itemId == R.id.navigation_events) {
-                    // TODO: Navigate to Events screen
-
+                    Intent intent = new Intent(MainActivity.this, EventsActivity.class);
+                    startActivity(intent);
                     return true;
                 } else if (itemId == R.id.navigation_profile) {
-                    // TODO: Navigate to Profile screen
                     Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
                     startActivity(intent);
                     return true;
@@ -362,5 +380,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
 }
+
 

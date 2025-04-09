@@ -112,9 +112,6 @@ public class ProfileActivity extends AppCompatActivity {
                     Intent intent = new Intent(ProfileActivity.this, NotificationActivity.class);
                     startActivity(intent);
                     return true;
-                } else if (itemId == R.id.navigation_messages) {
-                    // TODO: Navigate to Messages screen
-                    return true;
                 } else if (itemId == R.id.navigation_profile) {
 
                     return true;
