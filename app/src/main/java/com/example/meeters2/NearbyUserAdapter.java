@@ -1,5 +1,6 @@
 package com.example.meeters2;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,6 +47,8 @@ public class NearbyUserAdapter extends RecyclerView.Adapter<NearbyUserAdapter.Vi
         NearbyUser user = userList.get(position);
         holder.textNearbyName.setText(user.getName());
 
+        Log.d("NearbyAdapter", "Binding name: " + user.getName());
+
         // Handle click to send request
         holder.itemView.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
@@ -70,8 +73,16 @@ public class NearbyUserAdapter extends RecyclerView.Adapter<NearbyUserAdapter.Vi
                                 .get()
                                 .addOnSuccessListener(documentSnapshot -> {
                                     if (documentSnapshot.exists()) {
-                                        String senderName = documentSnapshot.getString("firstName") + " " +
-                                                documentSnapshot.getString("lastName");
+                                        String firstName = documentSnapshot.getString("firstName");
+                                        String lastName = documentSnapshot.getString("lastName");
+
+                                        if (firstName == null) firstName = "";
+                                        if (lastName == null) lastName = "";
+
+                                        String senderName = (firstName + " " + lastName).trim();
+                                        if (senderName.isEmpty()) {
+                                            senderName = "Unknown User";
+                                        }
 
                                         Map<String, Object> request = new HashMap<>();
                                         request.put("timestamp", FieldValue.serverTimestamp());

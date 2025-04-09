@@ -217,21 +217,20 @@ public class MainActivity extends AppCompatActivity {
                     FirebaseFirestore db = FirebaseFirestore.getInstance();
                     GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
 
-                    Map<String, Object> locationUpdate = new HashMap<>();
-                    locationUpdate.put("g", geoPoint); // 'g' is the default location field GeoFirestore expects
-                    locationUpdate.put("timestamp", FieldValue.serverTimestamp());
+                    GeoFirestore geoFirestore = new GeoFirestore(db.collection("users"));
+                    geoFirestore.setLocation(currentUser.getUid(), new GeoPoint(location.getLatitude(), location.getLongitude()), exception -> {
+                        if (exception == null) {
+                            Log.d("GeoFirestore", "✅ Location set successfully!");
+                            Toast.makeText(MainActivity.this, "Location updated!", Toast.LENGTH_SHORT).show();
 
-                    db.collection("users").document(currentUser.getUid())
-                            .update(locationUpdate)
-                            .addOnSuccessListener(aVoid -> {
-                                Toast.makeText(MainActivity.this, "Location updated!", Toast.LENGTH_SHORT).show();
-                            })
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(MainActivity.this, "Failed to update location", Toast.LENGTH_SHORT).show();
-                            });
+                            // Start nearby user query
+                            findNearbyUsers(location);
+                        } else {
+                            Log.e("GeoFirestore", "❌ Failed to set location", exception);
+                            Toast.makeText(MainActivity.this, "Failed to update location", Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
-                    // query for nearby users
-                    findNearbyUsers(location);
                 }
             });
         }
@@ -239,6 +238,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void findNearbyUsers(Location currentLocation) {
+        Log.d("GeoQuery", "Starting nearby user query from location: " + currentLocation.getLatitude() + ", " + currentLocation.getLongitude());
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference usersRef = db.collection("users");
 
@@ -250,20 +251,29 @@ public class MainActivity extends AppCompatActivity {
                 .addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
                     @Override
                     public void onDocumentEntered(DocumentSnapshot documentSnapshot, GeoPoint location) {
-                        Log.d("Nearby", "User found: " + documentSnapshot.getId());
-
-                        //Display users on in a list
+                        Log.d("GeoQuery", "✅ Document ENTERED: " + documentSnapshot.getId());
+                        Log.d("GeoQuery", "Data: " + documentSnapshot.getData());
                         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                        String senderId = documentSnapshot.getId();
 
-                        // Skip if this is the current user
-                        if (documentSnapshot.getId().equals(currentUserId)) return;
+                        if (documentSnapshot.getId().equals(currentUserId)) return; // Skip current user
 
-                        String name = documentSnapshot.getString("firstName") + " " + documentSnapshot.getString("lastName");
-                        NearbyUser user = new NearbyUser(senderId, name);
+                        // Fetch first and last name
+                        String firstName = documentSnapshot.getString("firstName");
+                        String lastName = documentSnapshot.getString("lastName");
 
 
-                        //Avoid duplicates
+                        Log.d("NearbyDebug", "User ID: " + documentSnapshot.getId());
+                        Log.d("NearbyDebug", "First Name: " + firstName);
+                        Log.d("NearbyDebug", "Last Name: " + lastName);
+
+                        // Handle null values
+                        if (firstName == null) firstName = "";
+                        if (lastName == null) lastName = "";
+
+                        String name = firstName + " " + lastName;
+                        NearbyUser user = new NearbyUser(documentSnapshot.getId(), name);
+
+                        // Avoid duplicates
                         boolean exists = false;
                         for (NearbyUser u : nearbyUsers) {
                             if (u.getId().equals(user.getId())) {
@@ -271,31 +281,37 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             }
                         }
+
                         if (!exists) {
                             nearbyUsers.add(user);
                             nearbyUserAdapter.notifyDataSetChanged();
                         }
                     }
 
+
                     @Override
                     public void onDocumentExited(DocumentSnapshot documentSnapshot) {
+                        Log.d("GeoQuery", "User exited: " + documentSnapshot.getId());
                     }
 
                     @Override
                     public void onDocumentMoved(DocumentSnapshot documentSnapshot, GeoPoint location) {
+                        Log.d("GeoQuery", "User moved: " + documentSnapshot.getId());
                     }
 
                     @Override
                     public void onDocumentChanged(DocumentSnapshot documentSnapshot, GeoPoint location) {
+                        Log.d("GeoQuery", "User changed: " + documentSnapshot.getId());
                     }
 
                     @Override
                     public void onGeoQueryReady() {
+                        Log.d("GeoQuery", "✅ GeoQuery is ready. All initial data loaded.");
                     }
 
                     @Override
                     public void onGeoQueryError(Exception exception) {
-                        Log.e("GeoFirestore", "GeoQuery Error", exception);
+                        Log.e("GeoQuery", "❌ GeoQuery Error: " + exception.getMessage(), exception);
                     }
                 });
     }
