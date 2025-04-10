@@ -1,5 +1,10 @@
 package com.example.meeters2;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import android.util.Log;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -27,19 +32,38 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
+import android.location.Location;
+
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.FieldValue;
+
+import org.imperiumlabs.geofirestore.GeoFirestore;
+import org.imperiumlabs.geofirestore.callbacks.GeoQueryDataEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.CollectionReference;
+
+import com.google.firebase.messaging.FirebaseMessaging;
+
 /**
-  MainActivity - The home screen of the app
-  This activity shows:
-  1. User profile and notifications in the app bar
-  2. A search bar for finding events/people
-  3. Upcoming events in a horizontal scrolling list
-  4. Suggested matches in a horizontal scrolling list
-  5. Bottom navigation for accessing different sections of the app
+ MainActivity - The home screen of the app
+ This activity shows:
+ 1. User profile and notifications in the app bar
+ 2. A search bar for finding events/people
+ 3. Upcoming events in a horizontal scrolling list
+ 4. Suggested matches in a horizontal scrolling list
+ 5. Bottom navigation for accessing different sections of the app
  */
 public class MainActivity extends AppCompatActivity {
+    private List<NearbyUser> nearbyUsers = new ArrayList<>();
+    private NearbyUserAdapter nearbyUserAdapter;
     // Firebase authentication instance
     private FirebaseAuth mAuth;
-    
+
     // UI Components
     private TextView welcomeText;              // Shows welcome message with user's name
     private ImageView profileImage;            // User's profile picture
@@ -75,11 +99,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
 
         // Initialize Firebase Auth for user authentication
         mAuth = FirebaseAuth.getInstance();
@@ -89,11 +116,18 @@ public class MainActivity extends AppCompatActivity {
 
         setupToolbar();
 
+        bottomNavigation.setSelectedItemId(R.id.navigation_home); // highlight HOME tab
+
+
+        //asks user for location permission
+        checkLocationPermission();
+
         // Check if user is signed in, if not redirect to login
         checkUserAuthentication();
 
         // RecyclerViews for events and matches
         setupRecyclerViews();
+
 
         setupBottomNavigation();
 
@@ -114,8 +148,6 @@ public class MainActivity extends AppCompatActivity {
     // Find the ImageButton for notifications
 
 
-
-
     /**
      * Initialize all UI components by finding them in the layout
      */
@@ -124,11 +156,9 @@ public class MainActivity extends AppCompatActivity {
         profileImage = findViewById(R.id.profileImage);
         logoutButton = findViewById(R.id.logoutButton);
         notificationButton = findViewById(R.id.notificationsButton);
-        upcomingEventsRecyclerView = findViewById(R.id.upcomingEventsRecyclerView);
         suggestedMatchesRecyclerView = findViewById(R.id.suggestedMatchesRecyclerView);
         bottomNavigation = findViewById(R.id.bottomNavigation);
     }
-
 
 
     /**
@@ -154,29 +184,145 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        //asks user for location permission
-        checkLocationPermission();
-
 
         // Update welcome text with user's email
         welcomeText.setText("Welcome, " + currentUser.getEmail() + "!");
+
+        // Store FCM token in Firestore after login
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        String token = task.getResult();
+                        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                        FirebaseFirestore.getInstance()
+                                .collection("users")
+                                .document(uid)
+                                .update("fcmToken", token);
+                    }
+                });
 
         // Update welcome text with user's name (using email username)
         String email = currentUser.getEmail();
         String displayName = email != null ? email.split("@")[0] : "User";
         welcomeText.setText("Hello, " + displayName);
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+
+            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+            fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+                if (location != null) {
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+
+                    GeoFirestore geoFirestore = new GeoFirestore(db.collection("users"));
+                    geoFirestore.setLocation(currentUser.getUid(), new GeoPoint(location.getLatitude(), location.getLongitude()), exception -> {
+                        if (exception == null) {
+                            Log.d("GeoFirestore", "✅ Location set successfully!");
+                            Toast.makeText(MainActivity.this, "Location updated!", Toast.LENGTH_SHORT).show();
+
+                            // Start nearby user query
+                            findNearbyUsers(location);
+                        } else {
+                            Log.e("GeoFirestore", "❌ Failed to set location", exception);
+                            Toast.makeText(MainActivity.this, "Failed to update location", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+            });
+        }
+
     }
 
+    private void findNearbyUsers(Location currentLocation) {
+        Log.d("GeoQuery", "Starting nearby user query from location: " + currentLocation.getLatitude() + ", " + currentLocation.getLongitude());
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference usersRef = db.collection("users");
+
+        GeoFirestore geoFirestore = new GeoFirestore(usersRef);
+
+        GeoPoint center = new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
+
+        geoFirestore.queryAtLocation(center, 10.0) // Radius in km
+                .addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
+                    @Override
+                    public void onDocumentEntered(DocumentSnapshot documentSnapshot, GeoPoint location) {
+                        Log.d("GeoQuery", "✅ Document ENTERED: " + documentSnapshot.getId());
+                        Log.d("GeoQuery", "Data: " + documentSnapshot.getData());
+                        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                        if (documentSnapshot.getId().equals(currentUserId)) return; // Skip current user
+
+                        // Fetch first and last name
+                        String firstName = documentSnapshot.getString("firstName");
+                        String lastName = documentSnapshot.getString("lastName");
+
+
+                        Log.d("NearbyDebug", "User ID: " + documentSnapshot.getId());
+                        Log.d("NearbyDebug", "First Name: " + firstName);
+                        Log.d("NearbyDebug", "Last Name: " + lastName);
+
+                        // Handle null values
+                        if (firstName == null) firstName = "";
+                        if (lastName == null) lastName = "";
+
+                        String name = firstName + " " + lastName;
+                        NearbyUser user = new NearbyUser(documentSnapshot.getId(), name);
+
+                        // Avoid duplicates
+                        boolean exists = false;
+                        for (NearbyUser u : nearbyUsers) {
+                            if (u.getId().equals(user.getId())) {
+                                exists = true;
+                                break;
+                            }
+                        }
+
+                        if (!exists) {
+                            nearbyUsers.add(user);
+                            nearbyUserAdapter.notifyDataSetChanged();
+                        }
+                    }
+
+
+                    @Override
+                    public void onDocumentExited(DocumentSnapshot documentSnapshot) {
+                        Log.d("GeoQuery", "User exited: " + documentSnapshot.getId());
+                    }
+
+                    @Override
+                    public void onDocumentMoved(DocumentSnapshot documentSnapshot, GeoPoint location) {
+                        Log.d("GeoQuery", "User moved: " + documentSnapshot.getId());
+                    }
+
+                    @Override
+                    public void onDocumentChanged(DocumentSnapshot documentSnapshot, GeoPoint location) {
+                        Log.d("GeoQuery", "User changed: " + documentSnapshot.getId());
+                    }
+
+                    @Override
+                    public void onGeoQueryReady() {
+                        Log.d("GeoQuery", "✅ GeoQuery is ready. All initial data loaded.");
+                    }
+
+                    @Override
+                    public void onGeoQueryError(Exception exception) {
+                        Log.e("GeoQuery", "❌ GeoQuery Error: " + exception.getMessage(), exception);
+                    }
+                });
+    }
 
     private void setupRecyclerViews() {
         // Set up horizontal layout managers for both RecyclerViews
-        upcomingEventsRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        suggestedMatchesRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        suggestedMatchesRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
         // TODO: Set up proper adapters with real data
-        // For now, just set empty adapters
-        setupEmptyAdapter(upcomingEventsRecyclerView);
-        setupEmptyAdapter(suggestedMatchesRecyclerView);
+        nearbyUserAdapter = new NearbyUserAdapter(nearbyUsers);
+        suggestedMatchesRecyclerView.setAdapter(nearbyUserAdapter);
     }
 
     /**
@@ -191,7 +337,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onBindViewHolder(@NonNull EmptyViewHolder holder, int position) {}
+            public void onBindViewHolder(@NonNull EmptyViewHolder holder, int position) {
+            }
 
             @Override
             public int getItemCount() {
@@ -213,23 +360,20 @@ public class MainActivity extends AppCompatActivity {
      * Set up the bottom navigation with click listeners
      */
     private void setupBottomNavigation() {
+        bottomNavigation.setSelectedItemId(R.id.navigation_home); // highlight HOME tab
+
         bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
-                
-                if (itemId == R.id.navigation_home) {
-                    // If already on home
-                    return true;
-                } else if (itemId == R.id.navigation_events) {
-                    // TODO: Navigate to Events screen
 
-                    return true;
-                } else if (itemId == R.id.navigation_messages) {
-                    // TODO: Navigate to Messages screen
+                if (itemId == R.id.navigation_home) {
+                    return true; // already on home
+                } else if (itemId == R.id.navigation_events) {
+                    Intent intent = new Intent(MainActivity.this, EventsActivity.class);
+                    startActivity(intent);
                     return true;
                 } else if (itemId == R.id.navigation_profile) {
-                    // TODO: Navigate to Profile screen
                     Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
                     startActivity(intent);
                     return true;
@@ -249,7 +393,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Sign out the user
                 mAuth.signOut();
-                
+
                 // Redirect to login screen
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -259,4 +403,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
 }
+
+

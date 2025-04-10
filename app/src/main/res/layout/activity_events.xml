@@ -82,44 +82,24 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Search Bar Section -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                app:boxCornerRadiusTopStart="25dp"
-                app:boxCornerRadiusTopEnd="25dp"
-                app:boxCornerRadiusBottomStart="25dp"
-                app:boxCornerRadiusBottomEnd="25dp">
-
-                <!-- Search input field with search icon -->
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Search events or people"
-                    android:drawableStart="@drawable/ic_search"
-                    android:drawablePadding="8dp"
-                    android:padding="16dp"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Suggested Matches Section -->
+            <!-- Incoming Requests Section -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Suggested Matches"
+                android:text="Incoming Meeting Requests"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="16dp"/>
 
-            <!-- Vertical scrolling list of suggested matches -->
+            <!-- RecyclerView for incoming requests -->
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/suggestedMatchesRecyclerView"
+                android:id="@+id/requestRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
                 android:clipToPadding="false"
                 android:padding="4dp" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
@@ -133,4 +113,4 @@
         app:itemIconTint="@color/bottom_nav_colors"
         app:itemTextColor="@color/bottom_nav_colors"/>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout> 
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
