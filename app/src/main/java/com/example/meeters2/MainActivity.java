@@ -116,9 +116,6 @@ public class MainActivity extends AppCompatActivity {
 
         setupToolbar();
 
-        bottomNavigation.setSelectedItemId(R.id.navigation_home); // highlight HOME tab
-
-
         //asks user for location permission
         checkLocationPermission();
 
@@ -127,7 +124,6 @@ public class MainActivity extends AppCompatActivity {
 
         // RecyclerViews for events and matches
         setupRecyclerViews();
-
 
         setupBottomNavigation();
 
@@ -344,27 +340,29 @@ public class MainActivity extends AppCompatActivity {
      * Set up the bottom navigation with click listeners
      */
     private void setupBottomNavigation() {
-        bottomNavigation.setSelectedItemId(R.id.navigation_home); // highlight HOME tab
-
         bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
 
                 if (itemId == R.id.navigation_home) {
-                    return true; // already on home
-                } else if (itemId == R.id.navigation_events) {
-                    Intent intent = new Intent(MainActivity.this, EventsActivity.class);
-                    startActivity(intent);
-                    return true;
-                } else if (itemId == R.id.navigation_profile) {
-                    Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                    startActivity(intent);
+                    // Already on Home
                     return true;
                 }
+
+                if (itemId == R.id.navigation_profile) {
+                    startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+                    overridePendingTransition(0, 0); // Smooth transition
+                    return true;
+                }
+
                 return false;
             }
         });
+
+        // Set default selected item safely
+        bottomNavigation.setSelectedItemId(R.id.navigation_home);
+
     }
 
 
