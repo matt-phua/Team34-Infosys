@@ -96,11 +96,7 @@ public class NotificationActivity extends AppCompatActivity {
                     Intent intent = new Intent(NotificationActivity.this, MainActivity.class);
                     startActivity(intent);
                     return true;
-                } else if (itemId == R.id.navigation_events) {
-                    // TODO: Navigate to Events screen
-
-                    return true;
-                } else if (itemId == R.id.navigation_profile) {
+                }  else if (itemId == R.id.navigation_profile) {
                     Intent intent = new Intent(NotificationActivity.this, ProfileActivity.class);
                     startActivity(intent);
                     return true;

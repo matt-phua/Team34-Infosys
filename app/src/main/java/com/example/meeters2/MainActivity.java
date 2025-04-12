@@ -116,9 +116,6 @@ public class MainActivity extends AppCompatActivity {
 
         setupToolbar();
 
-        bottomNavigation.setSelectedItemId(R.id.navigation_home); // highlight HOME tab
-
-
         //asks user for location permission
         checkLocationPermission();
 
@@ -128,12 +125,11 @@ public class MainActivity extends AppCompatActivity {
         // RecyclerViews for events and matches
         setupRecyclerViews();
 
-
         setupBottomNavigation();
 
         // Set up logout button click listener
         setupLogoutButton();
-        // Set an OnClickListener to handle the button click
+        // Set an OnClickListener to handle notification button click
         notificationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -155,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
         welcomeText = findViewById(R.id.welcomeText);
         profileImage = findViewById(R.id.profileImage);
         logoutButton = findViewById(R.id.logoutButton);
-        notificationButton = findViewById(R.id.notificationsButton);
+        notificationButton = findViewById(R.id.notificationButton);
         suggestedMatchesRecyclerView = findViewById(R.id.suggestedMatchesRecyclerView);
         bottomNavigation = findViewById(R.id.bottomNavigation);
     }
@@ -360,27 +356,29 @@ public class MainActivity extends AppCompatActivity {
      * Set up the bottom navigation with click listeners
      */
     private void setupBottomNavigation() {
-        bottomNavigation.setSelectedItemId(R.id.navigation_home); // highlight HOME tab
-
         bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
 
                 if (itemId == R.id.navigation_home) {
-                    return true; // already on home
-                } else if (itemId == R.id.navigation_events) {
-                    Intent intent = new Intent(MainActivity.this, EventsActivity.class);
-                    startActivity(intent);
-                    return true;
-                } else if (itemId == R.id.navigation_profile) {
-                    Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                    startActivity(intent);
+                    // Already on Home
                     return true;
                 }
+
+                if (itemId == R.id.navigation_profile) {
+                    startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+                    overridePendingTransition(0, 0); // Smooth transition
+                    return true;
+                }
+
                 return false;
             }
         });
+
+        // Set default selected item safely
+        bottomNavigation.setSelectedItemId(R.id.navigation_home);
+
     }
 
 
