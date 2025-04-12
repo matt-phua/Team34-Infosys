@@ -32,10 +32,21 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView nameText;
 
     private ImageButton logoutButton;          // Logout button
+    private ImageButton notificationButton;          // Notification button
 
     private FirebaseAuth mAuth;
 
     private BottomNavigationView bottomNavigation;      // Bottom navigation bar
+
+    private void initializeViews() {
+        //nameText = findViewById(R.id.nameText);
+        //profileImage = findViewById(R.id.profileImage);
+        logoutButton = findViewById(R.id.logoutButton);
+        notificationButton = findViewById(R.id.notificationButton);
+//      pcomingEventsRecyclerView = findViewById(R.id.upcomingEventsRecyclerView);
+//      suggestedMatchesRecyclerView = findViewById(R.id.suggestedMatchesRecyclerView);
+        bottomNavigation = findViewById(R.id.bottomNavigation);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,9 +68,6 @@ public class ProfileActivity extends AppCompatActivity {
                 meetingsToggle.setTextColor(Color.RED);
             }
         });
-
-
-
         // Initialize all UI components by finding them in the layout
         initializeViews();
 
@@ -78,15 +86,18 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Set up logout button click listener
         setupLogoutButton();
+
+        // Set an OnClickListener to handle notification button click
+        notificationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Intent to launch NotificationActivity when the button is clicked
+                Intent intent = new Intent(ProfileActivity.this, NotificationActivity.class);
+                startActivity(intent);
+            }
+        });
     }
-    private void initializeViews() {
-        //nameText = findViewById(R.id.nameText);
-        //profileImage = findViewById(R.id.profileImage);
-        logoutButton = findViewById(R.id.logoutButton);
-//      pcomingEventsRecyclerView = findViewById(R.id.upcomingEventsRecyclerView);
-//      suggestedMatchesRecyclerView = findViewById(R.id.suggestedMatchesRecyclerView);
-        bottomNavigation = findViewById(R.id.bottomNavigation);
-    }
+
     //String displayName = email != null ? email.split("@")[0] : "User";
     //nameText.setText(displayName);
     /**

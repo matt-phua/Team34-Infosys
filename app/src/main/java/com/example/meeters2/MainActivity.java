@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Set up logout button click listener
         setupLogoutButton();
-        // Set an OnClickListener to handle the button click
+        // Set an OnClickListener to handle notification button click
         notificationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
         welcomeText = findViewById(R.id.welcomeText);
         profileImage = findViewById(R.id.profileImage);
         logoutButton = findViewById(R.id.logoutButton);
-        notificationButton = findViewById(R.id.notificationsButton);
+        notificationButton = findViewById(R.id.notificationButton);
         suggestedMatchesRecyclerView = findViewById(R.id.suggestedMatchesRecyclerView);
         bottomNavigation = findViewById(R.id.bottomNavigation);
     }
