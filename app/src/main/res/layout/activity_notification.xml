@@ -3,13 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/background_light">
+    
     <!-- App Bar Section - Contains the toolbar with profile and notifications -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/meeters_purple"
-        app:layout_scrollFlags="scroll|enterAlways">
+        app:elevation="0dp">
 
         <!-- Toolbar - Custom toolbar with profile image, welcome text, and notifications -->
         <androidx.appcompat.widget.Toolbar
@@ -33,6 +35,7 @@
                     android:layout_height="40dp"
                     android:src="@drawable/ic_profile_placeholder"
                     android:background="@drawable/circle_background"
+                    android:elevation="2dp"
                     android:padding="8dp"/>
 
                 <!-- Welcome text that will show user's name -->
@@ -44,15 +47,17 @@
                     android:layout_marginStart="16dp"
                     android:textColor="@color/white"
                     android:textSize="18sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
 
-                <!-- Notifications button -->
+                <!-- Home button -->
                 <ImageButton
-                    android:id="@+id/notificationsButton"
+                    android:id="@+id/homeButton"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_notifications"
+                    android:src="@drawable/ic_home"
                     android:layout_marginEnd="8dp"
                     app:tint="@color/white" />
 
@@ -71,346 +76,182 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-    <LinearLayout
-        android:background="#FFFFFF"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-            <LinearLayout
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Notifications Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Notifications"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginBottom="24dp"/>
+
+            <!-- Notifications Card -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
+
                 <LinearLayout
-                    android:id="@+id/r0tzhmcbe684"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingTop="13dp"
-                    android:layout_marginTop="44dp"
-                    android:orientation="vertical">
-                    <LinearLayout
-                        android:id="@+id/rg71oxpqkyp5"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Meeting Requests Title -->
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:background="#BFFFFF"
+                        android:text="Meeting Requests"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary"
+                        android:layout_marginBottom="12dp"/>
 
-                        android:paddingVertical="7dp"
-                        android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="13dp"
-                        android:layout_marginStart="26dp"
-                        android:orientation="horizontal">
+                    <!-- RecyclerView for meeting requests -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/requestRecyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"/>
+                    
+                    <!-- Empty State for No Requests -->
+                    <LinearLayout
+                        android:id="@+id/emptyRequestsView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="32dp"
+                        android:visibility="gone">
 
                         <ImageView
-                            android:id="@+id/r3x1f9imkeim"
-                            android:layout_width="17dp"
-                            android:layout_height="1dp"
-                            android:layout_marginEnd="9dp"
-                            android:src="@mipmap/ic_launcher"
-                            android:scaleType="fitXY"
-                            />
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:src="@drawable/ic_notifications"
+                            app:tint="@color/meeters_purple_light"
+                            android:alpha="0.7"/>
+
                         <TextView
-                            android:id="@+id/rx3bl419bzem"
-                            android:textColor="#000000"
-                            android:textSize="15sp"
-                            android:layout_height="wrap_content"
                             android:layout_width="wrap_content"
-                            android:text="Back"
-                            />
+                            android:layout_height="wrap_content"
+                            android:text="No meeting requests"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary"
+                            android:layout_marginTop="16dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="When someone wants to meet you, you'll see their request here"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary"
+                            android:textAlignment="center"
+                            android:layout_marginTop="8dp"/>
                     </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+            
+            <!-- Sent Requests Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
                     <TextView
-                        android:id="@+id/rjwmzff8lf38"
-                        android:textColor="#000000"
-                        android:textSize="32sp"
-                        android:layout_marginBottom="12dp"
-                        android:layout_marginStart="27dp"
-                        android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
-                        android:text="Notifications"
-                        />
-                    <RelativeLayout
-                        android:id="@+id/rnkxu61o4i4g"
+                        android:layout_height="wrap_content"
+                        android:text="Your Sent Requests"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary"
+                        android:layout_marginBottom="12dp"/>
+
+                    <!-- RecyclerView for sent requests (if you want to show them separately) -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/sentRequestsRecyclerView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="38dp"
-                        android:layout_marginHorizontal="27dp"
-                        >
+                        android:nestedScrollingEnabled="false"
+                        android:visibility="gone"/>
+                        
+                    <!-- Sample Sent Request (for design demo, replace with RecyclerView in real app) -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="@color/background_light">
+
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical">
-                            <LinearLayout
-                                android:id="@+id/rbxuv34gvl1i"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:background="#f5f5f5"
-                                android:paddingVertical="12dp"
-                                android:paddingHorizontal="5dp"
-                                android:elevation="4dp"
-                                android:orientation="horizontal">
-                                <ImageView
-                                    android:id="@+id/rms5agjq8gbj"
-                                    android:layout_width="75dp"
-                                    android:layout_height="76dp"
-                                    android:layout_marginTop="6dp"
-                                    android:layout_marginEnd="3dp"
-                                    android:src="@mipmap/ic_launcher"
-                                    android:scaleType="fitXY"
-                                    />
-                                <LinearLayout
-                                    android:id="@+id/rnc2wg28btfd"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:layout_marginEnd="12dp"
-                                    android:orientation="vertical">
-                                    <TextView
-                                        android:id="@+id/rw2rvjal5jp"
-                                        android:textColor="#000000"
-                                        android:textSize="10sp"
-                                        android:layout_marginBottom="3dp"
-                                        android:layout_height="wrap_content"
-                                        android:layout_width="wrap_content"
-                                        android:text="03.05.2025 12:05pm"
-                                        />
-                                    <LinearLayout
-                                        android:id="@+id/rifed0epgnhe"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:orientation="vertical">
-                                        <TextView
-                                            android:id="@+id/rgl7vt8zsymo"
-                                            android:textColor="#030303"
-                                            android:textSize="14sp"
-                                            android:layout_height="wrap_content"
-                                            android:layout_width="87dp"
-                                            android:text="Jessica Parker"
-                                            />
-                                        <TextView
-                                            android:id="@+id/rbk8ur46ptri"
-                                            android:textColor="#000000"
-                                            android:textSize="14sp"
-                                            android:layout_marginHorizontal="1dp"
-                                            android:layout_height="wrap_content"
-                                            android:layout_width="match_parent"
-                                            android:layout_weight="1"
-                                            android:text="Hey! Do you want a cup of coffee?"
-                                            />
-                                    </LinearLayout>
-                                </LinearLayout>
-                                <LinearLayout
-                                    android:id="@+id/rwcjmj32i4ke"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="19dp"
-                                    android:orientation="vertical">
-                                    <LinearLayout
-                                        android:id="@+id/r0tkdglupypm"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:background="#68ffe0"
-                                        android:paddingVertical="4dp"
-                                        android:paddingLeft="10dp"
-                                        android:paddingRight="28dp"
-                                        android:layout_marginBottom="11dp"
-                                        android:orientation="vertical">
-                                        <TextView
-                                            android:id="@+id/rrqj7r5zzc9g"
-                                            android:textColor="#FFFFFF"
-                                            android:textSize="12sp"
-                                            android:layout_height="wrap_content"
-                                            android:layout_width="wrap_content"
-                                            android:text="Accept"
-                                            />
-                                    </LinearLayout>
-                                    <LinearLayout
-                                        android:id="@+id/r5249qz6s8p4"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:background="#ffd5d5"
-                                        android:clickable="true"
-                                        android:focusable="true"
-                                        android:orientation="vertical"
-                                        android:minHeight="48dp"
-                                        android:minWidth="48dp"
-                                        android:paddingVertical="8dp"
-                                        android:paddingHorizontal="20dp">
-
-                                        <TextView
-                                            android:id="@+id/rgwaereme1cw"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:text="Reject"
-                                            android:textColor="#FFFFFF"
-                                            android:textSize="12sp" />
-                                    </LinearLayout>
-                                </LinearLayout>
-                            </LinearLayout>
-                        </LinearLayout>
-                        <RelativeLayout
-                            android:id="@+id/rcm3h2e1ysn_rl"
-                            android:layout_marginTop="1dp"
-                            android:layout_marginStart="-1dp"
-                            android:layout_width="21dp"
                             android:layout_height="wrap_content"
-                            />
-                    </RelativeLayout>
-                    <LinearLayout
-                        android:id="@+id/rz31p3yds1aa"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="41dp"
-                        android:layout_marginHorizontal="26dp"
-                        android:orientation="vertical">
-
-                        <LinearLayout
-                            android:id="@+id/rcgnnd447fdg"
-                            android:layout_width="360dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="1dp"
-                            android:background="#ffeaea"
-                            android:elevation="4dp"
                             android:orientation="horizontal"
-                            android:paddingHorizontal="3dp"
-                            android:paddingTop="2dp"
-                            android:paddingBottom="17dp">
+                            android:padding="12dp">
+
+                            <ImageView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/ic_profile_placeholder"
+                                android:background="@drawable/circle_purple_bg"/>
 
                             <LinearLayout
-                                android:id="@+id/ryigffvi0lbq"
-                                android:layout_width="wrap_content"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginEnd="3dp"
-                                android:orientation="vertical">
-
-                                <ImageView
-                                    android:id="@+id/rm6vsu823p3"
-                                    android:layout_width="75dp"
-                                    android:layout_height="74dp"
-                                    android:layout_marginHorizontal="2dp"
-                                    android:scaleType="fitXY"
-                                    android:src="@mipmap/ic_launcher" />
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:id="@+id/rdknu1rdl91b"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="12dp"
-                                android:layout_marginBottom="19dp"
-                                android:orientation="vertical">
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:layout_marginStart="12dp">
 
                                 <TextView
-                                    android:id="@+id/r9yos8v5xqqi"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginBottom="2dp"
-                                    android:text="31.04.2025 5:54pm"
-                                    android:textColor="#000000"
-                                    android:textSize="10sp" />
+                                    android:text="Alex Johnson"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/text_primary"/>
 
-                                <LinearLayout
-                                    android:id="@+id/r3m7npn7132r"
+                                <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:orientation="vertical">
-
-                                    <TextView
-                                        android:id="@+id/rw6tr50urvnj"
-                                        android:layout_width="110dp"
-                                        android:layout_height="wrap_content"
-                                        android:text="Mohammad Nabil"
-                                        android:textColor="#030303"
-                                        android:textSize="14sp" />
-
-                                    <TextView
-                                        android:id="@+id/r5xdgcxp75a8"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginHorizontal="1dp"
-                                        android:text="Nabil have rejected ur invitation :("
-                                        android:textColor="#000000"
-                                        android:textSize="14sp" />
-                                </LinearLayout>
+                                    android:text="Request sent: 10 minutes ago"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/text_secondary"/>
                             </LinearLayout>
+
+                            <com.google.android.material.chip.Chip
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Pending"
+                                android:textSize="12sp"
+                                app:chipBackgroundColor="@color/warning_amber"
+                                app:chipStrokeWidth="0dp"
+                                android:textColor="@color/white"
+                                app:chipMinHeight="28dp"/>
                         </LinearLayout>
-                    </LinearLayout>
-                    <LinearLayout
-                        android:id="@+id/r8ubouwmc7a8"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="254dp"
-                        android:layout_marginHorizontal="26dp"
-                        android:orientation="vertical">
-
-                        <LinearLayout
-                            android:id="@+id/rbimfd8nf1h"
-                            android:layout_width="360dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="1dp"
-                            android:background="#FFFFFF"
-                            android:elevation="4dp"
-                            android:orientation="horizontal"
-                            android:paddingHorizontal="3dp"
-                            android:paddingTop="1dp"
-                            android:paddingBottom="16dp">
-
-                            <LinearLayout
-                                android:id="@+id/rt98ixhu4ajm"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginEnd="3dp"
-                                android:orientation="vertical">
-
-                                <ImageView
-                                    android:id="@+id/rdlpae8zl7ec"
-                                    android:layout_width="73dp"
-                                    android:layout_height="74dp"
-                                    android:layout_marginHorizontal="3dp"
-                                    android:scaleType="fitXY"
-                                    android:src="@drawable/ic_notifications" />
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:id="@+id/ruy96n2ap5if"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="13dp"
-                                android:layout_marginBottom="19dp"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:id="@+id/r46d9kghkm9s"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="7dp"
-                                    android:text="31.04.2025 5:54pm"
-                                    android:textColor="#000000"
-                                    android:textSize="10sp" />
-
-                                <TextView
-                                    android:id="@+id/r6febi4vjsh3"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="1dp"
-                                    android:layout_marginBottom="9dp"
-                                    android:text="John Tan"
-                                    android:textColor="#030303"
-                                    android:textSize="14sp" />
-
-                                <TextView
-                                    android:id="@+id/rtcf8q6hy5m9"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="John gave you a 5.0 ⭐️ rate!"
-                                    android:textColor="#000000"
-                                    android:textSize="14sp" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </LinearLayout>
-
+                    </androidx.cardview.widget.CardView>
                 </LinearLayout>
-            </LinearLayout>
-    </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
     <!-- Bottom Navigation Bar -->
@@ -419,8 +260,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:background="@color/white"
         app:menu="@menu/bottom_navigation_menu"
         app:itemIconTint="@color/bottom_nav_colors"
-        app:itemTextColor="@color/bottom_nav_colors"/>
+        app:itemTextColor="@color/bottom_nav_colors"
+        app:elevation="8dp"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

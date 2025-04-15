@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Write a message to introduce yourself:"
+        android:textSize="16sp"
+        android:textColor="#333333" />
+
+    <EditText
+        android:id="@+id/messageEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="Hello! I'd like to meet up with you..."
+        android:minLines="3"
+        android:maxLines="5"
+        android:gravity="top|start"
+        android:inputType="textMultiLine"
+        android:background="@drawable/rounded_edittext_background"
+        android:padding="12dp" />
+
+</LinearLayout> 

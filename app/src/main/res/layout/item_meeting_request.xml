@@ -1,44 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="12dp"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/rounded_bg"
-    android:layout_marginBottom="12dp">
-
-    <TextView
-        android:id="@+id/textSenderName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Sender Name"
-        android:textStyle="bold"
-        android:textSize="16sp"/>
-
-    <TextView
-        android:id="@+id/textRequestMessage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Message..."
-        android:layout_marginTop="4dp"/>
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <Button
-            android:id="@+id/buttonAccept"
-            android:layout_width="wrap_content"
+        <!-- Request Header: Name and Status -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Accept"
-            android:layout_marginEnd="8dp"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <Button
-            android:id="@+id/buttonReject"
-            android:layout_width="wrap_content"
+            <ImageView
+                android:id="@+id/requestProfileImageView"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_profile_placeholder"
+                android:background="@drawable/circle_background"
+                android:padding="8dp" />
+
+            <TextView
+                android:id="@+id/requestNameTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="User Name"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#333333" />
+
+            <TextView
+                android:id="@+id/requestStatusTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pending"
+                android:textSize="14sp"
+                android:textStyle="italic"
+                android:textColor="@color/meeters_purple" />
+        </LinearLayout>
+
+        <!-- Message -->
+        <TextView
+            android:id="@+id/requestMessageTextView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Reject"/>
+            android:layout_marginTop="8dp"
+            android:text="Hello, I'd like to connect with you!"
+            android:textSize="14sp"
+            android:textColor="#444444" />
+
+        <!-- Action Buttons: Accept/Decline - Only visible for pending requests for receiver -->
+        <LinearLayout
+            android:id="@+id/requestActionsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/acceptRequestButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:text="Accept"
+                android:textSize="12sp"
+                android:backgroundTint="@color/meeters_purple" />
+
+            <Button
+                android:id="@+id/declineRequestButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:text="Decline"
+                android:textSize="12sp"
+                android:backgroundTint="#E53935" />
+        </LinearLayout>
+
+        <!-- Reply Layout - Only visible after accepting -->
+        <LinearLayout
+            android:id="@+id/replyLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/replyEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Type a message..."
+                android:maxLines="1"
+                android:inputType="text"
+                android:background="@drawable/rounded_edittext_background"
+                android:padding="8dp"
+                android:layout_marginEnd="8dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sendReplyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Send"
+                android:textSize="12sp"
+                android:minWidth="60dp"
+                android:minHeight="40dp"
+                app:cornerRadius="20dp"
+                android:backgroundTint="@color/meeters_purple" />
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</androidx.cardview.widget.CardView>

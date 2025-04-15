@@ -1,107 +1,193 @@
 package com.example.meeters2;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FieldValue;
 
-import java.util.List;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class MeetingRequestAdapter extends RecyclerView.Adapter<MeetingRequestAdapter.ViewHolder> {
+public class MeetingRequestAdapter extends RecyclerView.Adapter<MeetingRequestAdapter.MeetingRequestViewHolder> {
 
-    private final List<MeetingRequest> requestList;
-    private final Context context;
-    private final String currentUserId;
+    private List<MeetingRequest> meetingRequests;
+    private Context context;
+    private FirebaseFirestore db;
+    private FirebaseAuth mAuth;
+    private String currentUserId;
 
-    public MeetingRequestAdapter(Context context, List<MeetingRequest> requestList, String currentUserId) {
+    public MeetingRequestAdapter(Context context, List<MeetingRequest> meetingRequests) {
         this.context = context;
-        this.requestList = requestList;
-        this.currentUserId = currentUserId;
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView senderName, message;
-        Button acceptButton, rejectButton;
-
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            senderName = itemView.findViewById(R.id.textSenderName);
-            message = itemView.findViewById(R.id.textRequestMessage);
-            acceptButton = itemView.findViewById(R.id.buttonAccept);
-            rejectButton = itemView.findViewById(R.id.buttonReject);
-        }
+        this.meetingRequests = meetingRequests;
+        this.db = FirebaseFirestore.getInstance();
+        this.mAuth = FirebaseAuth.getInstance();
+        this.currentUserId = mAuth.getCurrentUser() != null ? mAuth.getCurrentUser().getUid() : "";
     }
 
     @NonNull
     @Override
-    public MeetingRequestAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public MeetingRequestViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_meeting_request, parent, false);
-        return new ViewHolder(view);
+        return new MeetingRequestViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MeetingRequestAdapter.ViewHolder holder, int position) {
-        MeetingRequest request = requestList.get(position);
+    public void onBindViewHolder(@NonNull MeetingRequestViewHolder holder, int position) {
+        MeetingRequest request = meetingRequests.get(position);
+        boolean isCurrentUserSender = request.getSenderId().equals(currentUserId);
 
-        holder.senderName.setText(request.getSenderName());
-        holder.message.setText(request.getMessage());
-
-        holder.acceptButton.setOnClickListener(v -> showResponseDialog(request, "accepted"));
-        holder.rejectButton.setOnClickListener(v -> showResponseDialog(request, "rejected"));
+        // Set name based on whether current user is sender or receiver
+        String displayName = isCurrentUserSender ? request.getReceiverName() : request.getSenderName();
+        holder.nameTextView.setText(displayName);
+        
+        // Set message
+        holder.messageTextView.setText(request.getMessage());
+        
+        // Handle UI based on request status
+        switch (request.getStatus()) {
+            case "pending":
+                setupPendingUI(holder, request, isCurrentUserSender);
+                break;
+            case "accepted":
+                setupAcceptedUI(holder, request);
+                break;
+            case "declined":
+                // If declined and viewer is the receiver, don't show it at all
+                if (!isCurrentUserSender) {
+                    holder.itemView.setVisibility(View.GONE);
+                    holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
+                } else {
+                    holder.statusTextView.setText("Declined");
+                    holder.actionButtonsLayout.setVisibility(View.GONE);
+                    holder.replyLayout.setVisibility(View.GONE);
+                }
+                break;
+        }
     }
 
-    private void showResponseDialog(MeetingRequest request, String status) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(status.equals("accepted") ? "Accept Request" : "Reject Request");
+    private void setupPendingUI(MeetingRequestViewHolder holder, MeetingRequest request, boolean isCurrentUserSender) {
+        if (isCurrentUserSender) {
+            // Sender sees "Pending" status
+            holder.statusTextView.setText("Pending");
+            holder.actionButtonsLayout.setVisibility(View.GONE);
+            holder.replyLayout.setVisibility(View.GONE);
+        } else {
+            // Receiver sees accept/decline buttons
+            holder.statusTextView.setText("New Request");
+            holder.actionButtonsLayout.setVisibility(View.VISIBLE);
+            holder.replyLayout.setVisibility(View.GONE);
+            
+            // Set up accept button
+            holder.acceptButton.setOnClickListener(v -> {
+                request.setStatus("accepted");
+                updateRequestInFirestore(request);
+                notifyDataSetChanged();
+            });
+            
+            // Set up decline button
+            holder.declineButton.setOnClickListener(v -> {
+                request.setStatus("declined");
+                updateRequestInFirestore(request);
+                notifyDataSetChanged();
+            });
+        }
+    }
 
-        View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_response_message, null);
-        EditText responseInput = dialogView.findViewById(R.id.responseMessageEditText);
-        builder.setView(dialogView);
-
-        builder.setPositiveButton("Confirm", (dialog, which) -> {
-            String responseMessage = responseInput.getText().toString().trim();
-            if (responseMessage.isEmpty()) {
-                Toast.makeText(context, "Response cannot be empty", Toast.LENGTH_SHORT).show();
-                return;
+    private void setupAcceptedUI(MeetingRequestViewHolder holder, MeetingRequest request) {
+        holder.statusTextView.setText("Accepted");
+        holder.actionButtonsLayout.setVisibility(View.GONE);
+        holder.replyLayout.setVisibility(View.VISIBLE);
+        
+        // Set up reply button
+        holder.sendReplyButton.setOnClickListener(v -> {
+            String replyMessage = holder.replyEditText.getText().toString().trim();
+            if (!replyMessage.isEmpty()) {
+                sendMessage(request, replyMessage);
+                holder.replyEditText.setText("");
+                Toast.makeText(context, "Message sent", Toast.LENGTH_SHORT).show();
             }
-
-            // Update Firestore
-            Map<String, Object> update = new HashMap<>();
-            update.put("status", status);
-            update.put("responseMessage", responseMessage);
-            update.put("timestamp", FieldValue.serverTimestamp());
-
-            FirebaseFirestore.getInstance()
-                    .collection("requests")
-                    .document(currentUserId)
-                    .collection("incoming")
-                    .document(request.getSenderId())
-                    .update(update)
-                    .addOnSuccessListener(aVoid ->
-                            Toast.makeText(context, "Request " + status, Toast.LENGTH_SHORT).show()
-
-                    );
         });
+    }
 
-        builder.setNegativeButton("Cancel", null);
-        builder.show();
+    private void updateRequestInFirestore(MeetingRequest request) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("status", request.getStatus());
+        updates.put("updatedAt", new Date());
+        
+        db.collection("meetingRequests").document(request.getId())
+            .update(updates)
+            .addOnSuccessListener(aVoid -> {
+                Toast.makeText(context, "Request " + request.getStatus(), Toast.LENGTH_SHORT).show();
+            })
+            .addOnFailureListener(e -> {
+                Toast.makeText(context, "Error updating request", Toast.LENGTH_SHORT).show();
+            });
+    }
+
+    private void sendMessage(MeetingRequest request, String message) {
+        // Create a chat message in Firestore
+        Map<String, Object> chatMessage = new HashMap<>();
+        chatMessage.put("senderId", currentUserId);
+        chatMessage.put("receiverId", currentUserId.equals(request.getSenderId()) ? request.getReceiverId() : request.getSenderId());
+        chatMessage.put("message", message);
+        chatMessage.put("timestamp", new Date());
+        chatMessage.put("requestId", request.getId());
+        
+        db.collection("messages").add(chatMessage)
+            .addOnSuccessListener(documentReference -> {
+                // Message sent successfully
+            })
+            .addOnFailureListener(e -> {
+                Toast.makeText(context, "Failed to send message", Toast.LENGTH_SHORT).show();
+            });
     }
 
     @Override
     public int getItemCount() {
-        return requestList.size();
+        return meetingRequests.size();
+    }
+
+    public void updateData(List<MeetingRequest> newRequests) {
+        this.meetingRequests = newRequests;
+        notifyDataSetChanged();
+    }
+
+    public static class MeetingRequestViewHolder extends RecyclerView.ViewHolder {
+        TextView nameTextView;
+        TextView messageTextView;
+        TextView statusTextView;
+        LinearLayout actionButtonsLayout;
+        Button acceptButton;
+        Button declineButton;
+        LinearLayout replyLayout;
+        EditText replyEditText;
+        MaterialButton sendReplyButton;
+
+        public MeetingRequestViewHolder(@NonNull View itemView) {
+            super(itemView);
+            nameTextView = itemView.findViewById(R.id.requestNameTextView);
+            messageTextView = itemView.findViewById(R.id.requestMessageTextView);
+            statusTextView = itemView.findViewById(R.id.requestStatusTextView);
+            actionButtonsLayout = itemView.findViewById(R.id.requestActionsLayout);
+            acceptButton = itemView.findViewById(R.id.acceptRequestButton);
+            declineButton = itemView.findViewById(R.id.declineRequestButton);
+            replyLayout = itemView.findViewById(R.id.replyLayout);
+            replyEditText = itemView.findViewById(R.id.replyEditText);
+            sendReplyButton = itemView.findViewById(R.id.sendReplyButton);
+        }
     }
 }
