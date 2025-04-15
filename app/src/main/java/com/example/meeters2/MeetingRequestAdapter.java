@@ -142,17 +142,63 @@ public class MeetingRequestAdapter extends RecyclerView.Adapter<MeetingRequestAd
         // Create a chat message in Firestore
         Map<String, Object> chatMessage = new HashMap<>();
         chatMessage.put("senderId", currentUserId);
-        chatMessage.put("receiverId", currentUserId.equals(request.getSenderId()) ? request.getReceiverId() : request.getSenderId());
+        
+        // Make sure we're sending to the other person, not ourselves
+        String receiverId = currentUserId.equals(request.getSenderId()) 
+            ? request.getReceiverId() 
+            : request.getSenderId();
+        
+        chatMessage.put("receiverId", receiverId);
         chatMessage.put("message", message);
         chatMessage.put("timestamp", new Date());
         chatMessage.put("requestId", request.getId());
+        chatMessage.put("senderName", getCurrentUserName());
+        chatMessage.put("read", false);
         
         db.collection("messages").add(chatMessage)
             .addOnSuccessListener(documentReference -> {
                 // Message sent successfully
+                Toast.makeText(context, "Message sent", Toast.LENGTH_SHORT).show();
+                
+                // Send a notification to the receiver
+                sendNotification(receiverId, "New message from " + getCurrentUserName(), message);
             })
             .addOnFailureListener(e -> {
-                Toast.makeText(context, "Failed to send message", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Failed to send message: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+    }
+
+    // Helper method to get current user's name
+    private String getCurrentUserName() {
+        String name = "User"; // Default name
+        
+        // Try to find the user's name in the meeting request
+        for (MeetingRequest request : meetingRequests) {
+            if (request.getSenderId().equals(currentUserId)) {
+                return request.getSenderName();
+            } else if (request.getReceiverId().equals(currentUserId)) {
+                return request.getReceiverName();
+            }
+        }
+        
+        return name;
+    }
+
+    // Send a notification to the receiver
+    private void sendNotification(String receiverId, String title, String message) {
+        Map<String, Object> notification = new HashMap<>();
+        notification.put("userId", receiverId);
+        notification.put("title", title);
+        notification.put("message", message);
+        notification.put("timestamp", new Date());
+        notification.put("read", false);
+        
+        db.collection("notifications").add(notification)
+            .addOnSuccessListener(documentReference -> {
+                // Notification sent successfully
+            })
+            .addOnFailureListener(e -> {
+                // Failed to send notification, but we don't need to show an error to the user
             });
     }
 

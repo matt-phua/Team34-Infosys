@@ -293,6 +293,14 @@ public class MainActivity extends BaseActivity {
 
     private void updateUserLocationAndFindMatches() {
         try {
+            // Clear existing nearby users first to avoid showing old matches
+            if (nearbyUsers != null) {
+                nearbyUsers.clear();
+                if (nearbyUserAdapter != null) {
+                    nearbyUserAdapter.notifyDataSetChanged();
+                }
+            }
+            
             FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
             fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {

@@ -73,186 +73,194 @@
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
         
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <!-- Notifications Header -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Notifications"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:layout_marginBottom="24dp"/>
-
-            <!-- Notifications Card -->
-            <androidx.cardview.widget.CardView
+            android:fillViewport="true"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <LinearLayout
+                <!-- Notifications Header -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Notifications"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="24dp"/>
+
+                <!-- Notifications Card -->
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp">
 
-                    <!-- Meeting Requests Title -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Meeting Requests"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/text_primary"
-                        android:layout_marginBottom="12dp"/>
-
-                    <!-- RecyclerView for meeting requests -->
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/requestRecyclerView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:nestedScrollingEnabled="false"/>
-                    
-                    <!-- Empty State for No Requests -->
                     <LinearLayout
-                        android:id="@+id/emptyRequestsView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:gravity="center"
-                        android:padding="32dp"
-                        android:visibility="gone">
+                        android:padding="16dp">
 
-                        <ImageView
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
-                            android:src="@drawable/ic_notifications"
-                            app:tint="@color/meeters_purple_light"
-                            android:alpha="0.7"/>
-
+                        <!-- Meeting Requests Title -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="No meeting requests"
-                            android:textSize="16sp"
+                            android:text="Meeting Requests"
+                            android:textSize="18sp"
                             android:textStyle="bold"
                             android:textColor="@color/text_primary"
-                            android:layout_marginTop="16dp"/>
+                            android:layout_marginBottom="12dp"/>
+
+                        <!-- RecyclerView for meeting requests -->
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/requestRecyclerView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:nestedScrollingEnabled="false"/>
+                        
+                        <!-- Empty State for No Requests -->
+                        <LinearLayout
+                            android:id="@+id/emptyRequestsView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="32dp"
+                            android:visibility="gone">
+
+                            <ImageView
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
+                                android:src="@drawable/ic_notifications"
+                                app:tint="@color/meeters_purple_light"
+                                android:alpha="0.7"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="No meeting requests"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_primary"
+                                android:layout_marginTop="16dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="When someone wants to meet you, you'll see their request here"
+                                android:textSize="14sp"
+                                android:textColor="@color/text_secondary"
+                                android:textAlignment="center"
+                                android:layout_marginTop="8dp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+                
+                <!-- Sent Requests Card -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="When someone wants to meet you, you'll see their request here"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_secondary"
-                            android:textAlignment="center"
-                            android:layout_marginTop="8dp"/>
-                    </LinearLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-            
-            <!-- Sent Requests Card -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
+                            android:text="Your Sent Requests"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary"
+                            android:layout_marginBottom="12dp"/>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Your Sent Requests"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/text_primary"
-                        android:layout_marginBottom="12dp"/>
-
-                    <!-- RecyclerView for sent requests (if you want to show them separately) -->
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/sentRequestsRecyclerView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:nestedScrollingEnabled="false"
-                        android:visibility="gone"/>
-                        
-                    <!-- Sample Sent Request (for design demo, replace with RecyclerView in real app) -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        app:cardCornerRadius="8dp"
-                        app:cardElevation="0dp"
-                        app:cardBackgroundColor="@color/background_light">
-
-                        <LinearLayout
+                        <!-- RecyclerView for sent requests (if you want to show them separately) -->
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/sentRequestsRecyclerView"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:padding="12dp">
-
-                            <ImageView
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:src="@drawable/ic_profile_placeholder"
-                                android:background="@drawable/circle_purple_bg"/>
+                            android:nestedScrollingEnabled="false"
+                            android:visibility="gone"/>
+                            
+                        <!-- Sample Sent Request (for design demo, replace with RecyclerView in real app) -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            app:cardCornerRadius="8dp"
+                            app:cardElevation="0dp"
+                            app:cardBackgroundColor="@color/background_light">
 
                             <LinearLayout
-                                android:layout_width="0dp"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical"
-                                android:layout_marginStart="12dp">
+                                android:orientation="horizontal"
+                                android:padding="12dp">
 
-                                <TextView
+                                <ImageView
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:src="@drawable/ic_profile_placeholder"
+                                    android:background="@drawable/circle_purple_bg"/>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical"
+                                    android:layout_marginStart="12dp">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Alex Johnson"
+                                        android:textSize="16sp"
+                                        android:textStyle="bold"
+                                        android:textColor="@color/text_primary"/>
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Request sent: 10 minutes ago"
+                                        android:textSize="12sp"
+                                        android:textColor="@color/text_secondary"/>
+                                </LinearLayout>
+
+                                <com.google.android.material.chip.Chip
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Alex Johnson"
-                                    android:textSize="16sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/text_primary"/>
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Request sent: 10 minutes ago"
+                                    android:text="Pending"
                                     android:textSize="12sp"
-                                    android:textColor="@color/text_secondary"/>
+                                    app:chipBackgroundColor="@color/warning_amber"
+                                    app:chipStrokeWidth="0dp"
+                                    android:textColor="@color/white"
+                                    app:chipMinHeight="28dp"/>
                             </LinearLayout>
-
-                            <com.google.android.material.chip.Chip
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Pending"
-                                android:textSize="12sp"
-                                app:chipBackgroundColor="@color/warning_amber"
-                                app:chipStrokeWidth="0dp"
-                                android:textColor="@color/white"
-                                app:chipMinHeight="28dp"/>
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+                        </androidx.cardview.widget.CardView>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <!-- Bottom Navigation Bar -->
     <com.google.android.material.bottomnavigation.BottomNavigationView

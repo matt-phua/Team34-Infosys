@@ -5,12 +5,12 @@
     <color name="white">#FFFFFFFF</color>
     
     <!-- Primary colors -->
-    <color name="meeters_purple">#6A5ACD</color>  <!-- Updated to a softer purple -->
-    <color name="meeters_purple_light">#8677DD</color>
+    <color name="meeters_purple">#6200EE</color>
+    <color name="meeters_purple_light">#9965F4</color>
     <color name="meeters_purple_dark">#534090</color>
     
     <!-- Secondary colors -->
-    <color name="meeters_teal">#00BFA5</color>  <!-- Teal accent color -->
+    <color name="meeters_teal">#03DAC5</color>
     <color name="meeters_teal_light">#33D1BC</color>
     <color name="meeters_teal_dark">#008E76</color>
     
