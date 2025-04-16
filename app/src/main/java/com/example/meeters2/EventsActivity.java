@@ -108,7 +108,6 @@ public class EventsActivity extends BaseActivity {
 
     private void setupBottomNavigation() {
         BottomNavigationView bottomNavigation = findViewById(R.id.bottomNavigation);
-        bottomNavigation.setSelectedItemId(R.id.navigation_events); // highlight Events tab
 
         bottomNavigation.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
@@ -117,9 +116,7 @@ public class EventsActivity extends BaseActivity {
                 startActivity(new Intent(EventsActivity.this, MainActivity.class));
                 finish();
                 return true;
-            } else if (itemId == R.id.navigation_events) {
-                return true; // already on Events
-            } else if (itemId == R.id.navigation_profile) {
+            }  else if (itemId == R.id.navigation_profile) {
                 startActivity(new Intent(EventsActivity.this, ProfileActivity.class));
                 finish();
                 return true;

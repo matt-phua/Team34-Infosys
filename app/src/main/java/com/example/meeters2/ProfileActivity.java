@@ -36,6 +36,17 @@ public class ProfileActivity extends BaseActivity {
     private BottomNavigationView bottomNavigation;
     private boolean isEditing = false;
 
+
+    private void initializeViews() {
+        //nameText = findViewById(R.id.nameText);
+        //profileImage = findViewById(R.id.profileImage);
+        logoutButton = findViewById(R.id.logoutButton);
+        notificationButton = findViewById(R.id.notificationButton);
+//      pcomingEventsRecyclerView = findViewById(R.id.upcomingEventsRecyclerView);
+//      suggestedMatchesRecyclerView = findViewById(R.id.suggestedMatchesRecyclerView);
+        bottomNavigation = findViewById(R.id.bottomNavigation);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +55,7 @@ public class ProfileActivity extends BaseActivity {
         // Initialize Firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+
 
         // Find the ToggleButton
         ToggleButton meetingsToggle = findViewById(R.id.meetings_toggle);
@@ -201,7 +213,9 @@ public class ProfileActivity extends BaseActivity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 finish();
+
             });
         }
+
     }
 }
