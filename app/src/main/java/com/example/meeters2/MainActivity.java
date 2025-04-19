@@ -130,10 +130,8 @@ public class MainActivity extends BaseActivity {
         setupToolbar();
         setupBottomNavigation();
 
-
         // Initialize Firebase Auth for user authentication
         mAuth = FirebaseAuth.getInstance();
-
 
         // Check if user is signed in, if not redirect to login
         checkUserAuthentication();
@@ -152,7 +150,7 @@ public class MainActivity extends BaseActivity {
         welcomeText = findViewById(R.id.welcomeText);
         profileImage = findViewById(R.id.profileImage);
         logoutButton = findViewById(R.id.logoutButton);
-        notificationButton = findViewById(R.id.notificationButton);
+        notificationButton = findViewById(R.id.notificationsButton);
         suggestedMatchesRecyclerView = findViewById(R.id.suggestedMatchesRecyclerView);
         bottomNavigation = findViewById(R.id.bottomNavigation);
         meetingStatusText = findViewById(R.id.meetingStatusText);
@@ -549,11 +547,9 @@ public class MainActivity extends BaseActivity {
                 }
                 return false;
         });
-
         
         // Set the home item as selected
         bottomNavigation.setSelectedItemId(R.id.navigation_home);
-
     }
 
     @Override
