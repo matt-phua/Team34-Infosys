@@ -126,12 +126,13 @@
                             android:textColor="@color/text_primary"
                             android:layout_marginBottom="12dp"/>
 
-                        <!-- RecyclerView for meeting requests -->
+                        <!-- RecyclerView for meeting requests (if you want to show them separately) -->
                         <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/requestRecyclerView"
+                            android:id="@+id/sentRequestRecyclerView"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:nestedScrollingEnabled="false"/>
+                            android:nestedScrollingEnabled="false"
+                            android:visibility="gone"/>
                         
                         <!-- Empty State for No Requests -->
                         <LinearLayout
@@ -193,13 +194,14 @@
                             android:textColor="@color/text_primary"
                             android:layout_marginBottom="12dp"/>
 
-                        <!-- RecyclerView for sent requests (if you want to show them separately) -->
+
+
+                        <!-- RecyclerView for sent requests -->
                         <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/sentRequestsRecyclerView"
+                            android:id="@+id/requestRecyclerView"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:nestedScrollingEnabled="false"
-                            android:visibility="gone"/>
+                            android:nestedScrollingEnabled="false"/>
                             
                         <!-- Sample Sent Request (for design demo, replace with RecyclerView in real app) -->
                         <androidx.cardview.widget.CardView

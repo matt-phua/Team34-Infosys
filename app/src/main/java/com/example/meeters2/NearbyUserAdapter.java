@@ -172,4 +172,3 @@ public class NearbyUserAdapter extends RecyclerView.Adapter<NearbyUserAdapter.Vi
         }
     }
 }
-

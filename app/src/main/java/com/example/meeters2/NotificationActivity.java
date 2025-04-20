@@ -1,5 +1,6 @@
 package com.example.meeters2;
 
+import android.app.usage.NetworkStats;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -41,8 +42,12 @@ public class NotificationActivity extends BaseActivity {
     private static final String TAG = "NotificationActivity";
     private TextView nameText;
     private RecyclerView requestRecyclerView;
+    private RecyclerView sentRequestRecyclerView;
+
     private MeetingRequestAdapter requestAdapter;
+    private MeetingRequestAdapter sentRequestAdapter;
     private List<MeetingRequest> requestList = new ArrayList<>();
+    private List<MeetingRequest> sentRequestList = new ArrayList<>();
     private BottomNavigationView bottomNavigation;
     private View emptyRequestsView;
     private ImageButton homeButton;
@@ -92,6 +97,7 @@ public class NotificationActivity extends BaseActivity {
     private void initializeViews() {
         bottomNavigation = findViewById(R.id.bottomNavigation);
         requestRecyclerView = findViewById(R.id.requestRecyclerView);
+        sentRequestRecyclerView = findViewById(R.id.sentRequestRecyclerView);
         emptyRequestsView = findViewById(R.id.emptyRequestsView);
         homeButton = findViewById(R.id.homeButton);
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
@@ -162,72 +168,113 @@ public class NotificationActivity extends BaseActivity {
         requestRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         requestAdapter = new MeetingRequestAdapter(this, requestList);
         requestRecyclerView.setAdapter(requestAdapter);
+        sentRequestRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        sentRequestAdapter = new MeetingRequestAdapter(this, sentRequestList);
+        sentRequestRecyclerView.setAdapter(sentRequestAdapter);
     }
 
     private void loadMeetingRequests() {
         swipeRefreshLayout.setRefreshing(true);
-        
+
         FirebaseUser user = mAuth.getCurrentUser();
         if (user == null) {
             handleNoRequests();
             return;
         }
-        
+
         // Clear previous list
-        requestList.clear();
-        requestAdapter.notifyDataSetChanged();
-        
-        // Query where user is the receiver or sender
+        sentRequestList.clear();
+        sentRequestAdapter.notifyDataSetChanged();
+
+        // Query where user is the receiver
         db.collection("meetingRequests")
-            .whereEqualTo("receiverId", user.getUid())
-            .get()
-            .addOnSuccessListener(queryDocuments -> {
-                for (DocumentSnapshot document : queryDocuments) {
-                    MeetingRequest request = document.toObject(MeetingRequest.class);
-                    if (request != null) {
-                        requestList.add(request);
+                .whereEqualTo("receiverId", user.getUid())
+                .get()
+                .addOnSuccessListener(queryDocuments -> {
+                    for (DocumentSnapshot document : queryDocuments) {
+                        MeetingRequest request = document.toObject(MeetingRequest.class);
+                        if (request != null) {
+                            sentRequestList.add(request);
+                        }
                     }
-                }
-                
-                // Also get requests where user is the sender
-                db.collection("meetingRequests")
-                    .whereEqualTo("senderId", user.getUid())
-                    .get()
-                    .addOnSuccessListener(senderDocuments -> {
-                        for (DocumentSnapshot document : senderDocuments) {
-                            MeetingRequest request = document.toObject(MeetingRequest.class);
-                            if (request != null) {
-                                requestList.add(request);
-                            }
+
+                    // Notify the adapter
+                    sentRequestAdapter.notifyDataSetChanged();
+
+                    // Show the sentRequestRecyclerView if not empty
+                    if (!sentRequestList.isEmpty()) {
+                        sentRequestRecyclerView.setVisibility(View.VISIBLE);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error loading receiver meeting requests", e);
+                    swipeRefreshLayout.setRefreshing(false);
+                    handleNoRequests();
+                });
+
+        // Get requests where user is the sender
+        db.collection("meetingRequests")
+                .whereEqualTo("senderId", user.getUid())
+                .get()
+                .addOnSuccessListener(senderDocuments -> {
+                    for (DocumentSnapshot document : senderDocuments) {
+                        MeetingRequest request = document.toObject(MeetingRequest.class);
+                        if (request != null) {
+                            requestList.add(request);
                         }
-                        
-                        // Sort by creation time (newest first)
-                        Collections.sort(requestList, (r1, r2) -> 
-                            r2.getCreatedAt().compareTo(r1.getCreatedAt()));
-                            
-                        requestAdapter.notifyDataSetChanged();
-                        
-                        if (requestList.isEmpty()) {
-                            handleNoRequests();
-                        } else {
-                            emptyRequestsView.setVisibility(View.GONE);
-                            requestRecyclerView.setVisibility(View.VISIBLE);
-                        }
-                        
-                        swipeRefreshLayout.setRefreshing(false);
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e(TAG, "Error loading sender meeting requests", e);
-                        swipeRefreshLayout.setRefreshing(false);
+                    }
+
+                    // Sort by creation time (newest first)
+                    Collections.sort(requestList, (r1, r2) -> r2.getCreatedAt().compareTo(r1.getCreatedAt()));
+
+                    requestAdapter.notifyDataSetChanged();
+
+                    if (requestList.isEmpty()) {
                         handleNoRequests();
-                    });
-            })
-            .addOnFailureListener(e -> {
-                Log.e(TAG, "Error loading receiver meeting requests", e);
-                swipeRefreshLayout.setRefreshing(false);
-                handleNoRequests();
-            });
+                    } else {
+                        emptyRequestsView.setVisibility(View.GONE);
+                        requestRecyclerView.setVisibility(View.VISIBLE);
+                    }
+
+                    swipeRefreshLayout.setRefreshing(false);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error loading sender meeting requests", e);
+                    swipeRefreshLayout.setRefreshing(false);
+                    handleNoRequests();
+                });
     }
+
+//    private void loadRequests() {
+//        swipeRefreshLayout.setRefreshing(true);
+//
+//        FirebaseUser user = mAuth.getCurrentUser();
+//        if (user == null) {
+//            handleNoRequests();
+//            return;
+//        }
+//
+//        // Clear previous list
+//        requestList.clear();
+//        requestAdapter.notifyDataSetChanged();
+//        // Query where user is the receiver
+//        db.collection("meetingRequests")
+//                .whereEqualTo("receiverId", user.getUid())
+//                .get()
+//                .addOnSuccessListener(queryDocuments -> {
+//                    for (DocumentSnapshot document : queryDocuments) {
+//                        MeetingRequest request = document.toObject(MeetingRequest.class);
+//                        if (request != null) {
+//                            requestList.add(request);
+//                        }
+//                    }
+//                })
+//                .addOnFailureListener(e -> {
+//                    Log.e(TAG, "Error loading receiver meeting requests", e);
+//                    swipeRefreshLayout.setRefreshing(false);
+//                    handleNoRequests();
+//                });
+//    }
     
     private void handleNoRequests() {
         if (emptyRequestsView != null && requestRecyclerView != null) {

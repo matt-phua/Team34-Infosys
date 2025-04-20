@@ -45,19 +45,6 @@ public class ProfileActivity extends BaseActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        // Find the ToggleButton
-        ToggleButton meetingsToggle = findViewById(R.id.meetings_toggle);
-        meetingsToggle.setTextColor(Color.RED);
-
-        meetingsToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                meetingsToggle.setTextColor(Color.GREEN);
-                updateMeetingStatus(true);
-            } else {
-                meetingsToggle.setTextColor(Color.RED);
-                updateMeetingStatus(false);
-            }
-        });
 
         initializeViews();
         setupToolbar();
@@ -128,18 +115,6 @@ public class ProfileActivity extends BaseActivity {
 
                         if (aboutMe != null) {
                             aboutMeText.setText(aboutMe);
-                        }
-                        
-                        // Set the default meeting status to true if not set previously
-                        ToggleButton meetingsToggle = findViewById(R.id.meetings_toggle);
-                        if (isMeeting != null) {
-                            meetingsToggle.setChecked(isMeeting);
-                            meetingsToggle.setTextColor(isMeeting ? Color.GREEN : Color.RED);
-                        } else {
-                            // Default to meeting (true) if not set
-                            meetingsToggle.setChecked(true);
-                            meetingsToggle.setTextColor(Color.GREEN);
-                            updateMeetingStatus(true);
                         }
                     }
                 });

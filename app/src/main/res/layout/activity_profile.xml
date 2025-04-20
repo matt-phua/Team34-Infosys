@@ -132,43 +132,6 @@
                 </LinearLayout>
             </FrameLayout>
 
-            <!-- Status Card -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="-20dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="4dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Meeting Status:"
-                        android:textColor="#333333"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <ToggleButton
-                        android:id="@+id/meetings_toggle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:checked="false"
-                        android:textOff="Not Available"
-                        android:textOn="Available" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
             <!-- About Me Section -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
