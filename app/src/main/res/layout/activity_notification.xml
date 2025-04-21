@@ -202,62 +202,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:nestedScrollingEnabled="false"/>
-                            
-                        <!-- Sample Sent Request (for design demo, replace with RecyclerView in real app) -->
-                        <androidx.cardview.widget.CardView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="8dp"
-                            app:cardCornerRadius="8dp"
-                            app:cardElevation="0dp"
-                            app:cardBackgroundColor="@color/background_light">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:padding="12dp">
-
-                                <ImageView
-                                    android:layout_width="40dp"
-                                    android:layout_height="40dp"
-                                    android:src="@drawable/ic_profile_placeholder"
-                                    android:background="@drawable/circle_purple_bg"/>
-
-                                <LinearLayout
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:orientation="vertical"
-                                    android:layout_marginStart="12dp">
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="Alex Johnson"
-                                        android:textSize="16sp"
-                                        android:textStyle="bold"
-                                        android:textColor="@color/text_primary"/>
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="Request sent: 10 minutes ago"
-                                        android:textSize="12sp"
-                                        android:textColor="@color/text_secondary"/>
-                                </LinearLayout>
-
-                                <com.google.android.material.chip.Chip
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Pending"
-                                    android:textSize="12sp"
-                                    app:chipBackgroundColor="@color/warning_amber"
-                                    app:chipStrokeWidth="0dp"
-                                    android:textColor="@color/white"
-                                    app:chipMinHeight="28dp"/>
-                            </LinearLayout>
-                        </androidx.cardview.widget.CardView>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
             </LinearLayout>

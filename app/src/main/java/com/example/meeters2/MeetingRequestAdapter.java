@@ -63,7 +63,8 @@ public class MeetingRequestAdapter extends RecyclerView.Adapter<MeetingRequestAd
                 setupPendingUI(holder, request, isCurrentUserSender);
                 break;
             case "accepted":
-                setupAcceptedUI(holder, request);
+                String message = "";
+                setupAcceptedUI(holder, request, message);
                 break;
             case "declined":
                 // If declined and viewer is the receiver, don't show it at all
@@ -106,19 +107,27 @@ public class MeetingRequestAdapter extends RecyclerView.Adapter<MeetingRequestAd
             });
         }
     }
-
-    private void setupAcceptedUI(MeetingRequestViewHolder holder, MeetingRequest request) {
+    // This creates the tab
+    private void setupAcceptedUI(MeetingRequestViewHolder holder, MeetingRequest request, String message) {
         holder.statusTextView.setText("Accepted");
         holder.actionButtonsLayout.setVisibility(View.GONE);
         holder.replyLayout.setVisibility(View.VISIBLE);
-        
-        // Set up reply button
+
         holder.sendReplyButton.setOnClickListener(v -> {
             String replyMessage = holder.replyEditText.getText().toString().trim();
             if (!replyMessage.isEmpty()) {
-                sendMessage(request, replyMessage);
+                // Update the message on the MeetingRequest object
+                request.setMessage(replyMessage);
+
+                // Save the updated message for Firestore
+                updateRequestMessageInFirestore(request);
+
+                // Clear the reply field
                 holder.replyEditText.setText("");
-                Toast.makeText(context, "Message sent", Toast.LENGTH_SHORT).show();
+
+                Toast.makeText(context, "Message updated", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "Message cannot be empty", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -137,36 +146,51 @@ public class MeetingRequestAdapter extends RecyclerView.Adapter<MeetingRequestAd
                 Toast.makeText(context, "Error updating request", Toast.LENGTH_SHORT).show();
             });
     }
+    private void updateRequestMessageInFirestore(MeetingRequest request) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("message", request.getMessage());
+        updates.put("updatedAt", new Date());
 
-    private void sendMessage(MeetingRequest request, String message) {
-        // Create a chat message in Firestore
-        Map<String, Object> chatMessage = new HashMap<>();
-        chatMessage.put("senderId", currentUserId);
-        
-        // Make sure we're sending to the other person, not ourselves
-        String receiverId = currentUserId.equals(request.getSenderId()) 
-            ? request.getReceiverId() 
-            : request.getSenderId();
-        
-        chatMessage.put("receiverId", receiverId);
-        chatMessage.put("message", message);
-        chatMessage.put("timestamp", new Date());
-        chatMessage.put("requestId", request.getId());
-        chatMessage.put("senderName", getCurrentUserName());
-        chatMessage.put("read", false);
-        
-        db.collection("messages").add(chatMessage)
-            .addOnSuccessListener(documentReference -> {
-                // Message sent successfully
-                Toast.makeText(context, "Message sent", Toast.LENGTH_SHORT).show();
-                
-                // Send a notification to the receiver
-                sendNotification(receiverId, "New message from " + getCurrentUserName(), message);
-            })
-            .addOnFailureListener(e -> {
-                Toast.makeText(context, "Failed to send message: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            });
+        db.collection("meetingRequests").document(request.getId())
+                .update(updates)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(context, "Reply sent", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(context, "Error sending reply", Toast.LENGTH_SHORT).show();
+                });
     }
+
+//    private void sendMessage(MeetingRequest request, String message) {
+//        // Create a chat message in Firestore
+//        Map<String, Object> chatMessage = new HashMap<>();
+//        chatMessage.put("senderId", currentUserId);
+//
+//        // Make sure we're sending to the other person, not ourselves
+//        String receiverId = currentUserId.equals(request.getSenderId())
+//            ? request.getReceiverId()
+//            : request.getSenderId();
+//
+//        chatMessage.put("receiverId", receiverId);
+//        chatMessage.put("message", message);
+//        chatMessage.put("timestamp", new Date());
+//        chatMessage.put("requestId", request.getId());
+//        chatMessage.put("senderName", getCurrentUserName());
+//        chatMessage.put("read", false);
+//
+//        db.collection("messages").add(chatMessage)
+//            .addOnSuccessListener(documentReference -> {
+//                // Message sent successfully
+//                Toast.makeText(context, "Message sent", Toast.LENGTH_SHORT).show();
+//
+//                // Send a notification to the receiver
+//                sendNotification(receiverId, "New message from " + getCurrentUserName(), message);
+//            })
+//            .addOnFailureListener(e -> {
+//                Toast.makeText(context, "Failed to send message: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+//            });
+//
+//    }
 
     // Helper method to get current user's name
     private String getCurrentUserName() {

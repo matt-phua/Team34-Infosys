@@ -186,6 +186,14 @@ public class NotificationActivity extends BaseActivity {
         sentRequestList.clear();
         sentRequestAdapter.notifyDataSetChanged();
 
+        requestList.clear();
+        requestAdapter.notifyDataSetChanged();
+
+        // Hide both views initially
+        requestRecyclerView.setVisibility(View.GONE);
+        sentRequestRecyclerView.setVisibility(View.GONE);
+        emptyRequestsView.setVisibility(View.GONE);
+
         // Query where user is the receiver
         db.collection("meetingRequests")
                 .whereEqualTo("receiverId", user.getUid())
@@ -211,6 +219,8 @@ public class NotificationActivity extends BaseActivity {
                     swipeRefreshLayout.setRefreshing(false);
                     handleNoRequests();
                 });
+
+
 
         // Get requests where user is the sender
         db.collection("meetingRequests")
