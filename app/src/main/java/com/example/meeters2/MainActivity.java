@@ -535,7 +535,7 @@ public class MainActivity extends BaseActivity {
                 if (itemId == R.id.navigation_home) {
                 return true;
                 } else if (itemId == R.id.navigation_events) {
-                Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
+                Intent intent = new Intent(MainActivity.this, EventsActivity.class);
                     startActivity(intent);
                 finish();
                     return true;

@@ -155,6 +155,8 @@ public class NotificationActivity extends BaseActivity {
                 finish();
                 return true;
             } else if (itemId == R.id.navigation_events) {
+                // startActivity(new Intent(NotificationActivity.this, EventsActivity.class));
+                // finish();
                 return true;
             }
             

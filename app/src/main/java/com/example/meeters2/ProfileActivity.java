@@ -133,7 +133,7 @@ public class ProfileActivity extends BaseActivity {
                 finish();
                 return true;
             } else if (itemId == R.id.navigation_events) {
-                Intent intent = new Intent(ProfileActivity.this, NotificationActivity.class);
+                Intent intent = new Intent(ProfileActivity.this, EventsActivity.class);
                 startActivity(intent);
                 finish();
                 return true;
