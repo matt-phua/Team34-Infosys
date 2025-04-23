@@ -17,6 +17,7 @@ public class MeetingRequest {
     public MeetingRequest() {
     }
 
+    // Constructor for creating a new meeting request and initializing the createdAt and updatedAt fields
     public MeetingRequest(String id, String senderId, String senderName, String receiverId, 
                         String receiverName, String message, String status, Date createdAt) {
         this.id = id;
@@ -91,7 +92,7 @@ public class MeetingRequest {
     public Date getCreatedAt() {
         return createdAt;
     }
-
+    // This field is set when the request is created and should not be modified to track when it is created
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
