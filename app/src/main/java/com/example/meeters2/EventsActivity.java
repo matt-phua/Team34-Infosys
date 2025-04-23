@@ -105,7 +105,7 @@ public class EventsActivity extends BaseActivity {
         notificationButton = findViewById(R.id.notificationsButton);
         requestRecyclerView = findViewById(R.id.requestRecyclerView);
     }
-
+    // Bottom Navbar
     private void setupBottomNavigation() {
         BottomNavigationView bottomNavigation = findViewById(R.id.bottomNavigation);
         bottomNavigation.setSelectedItemId(R.id.navigation_events); // highlight Events tab

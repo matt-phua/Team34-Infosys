@@ -30,6 +30,7 @@ public class MeetingRequestAdapter extends RecyclerView.Adapter<MeetingRequestAd
     private FirebaseAuth mAuth;
     private String currentUserId;
 
+    // Constructor initializes the adapter with a context and a list of MeetingRequest objects
     public MeetingRequestAdapter(Context context, List<MeetingRequest> meetingRequests) {
         this.context = context;
         this.meetingRequests = meetingRequests;
@@ -80,6 +81,9 @@ public class MeetingRequestAdapter extends RecyclerView.Adapter<MeetingRequestAd
         }
     }
 
+    // This creates the MeetingRequest UI
+    // If the current user is the sender, they see "Pending" status and no buttons
+    // If the current user is the receiver, they see "New Request" and accept/decline buttons
     private void setupPendingUI(MeetingRequestViewHolder holder, MeetingRequest request, boolean isCurrentUserSender) {
         if (isCurrentUserSender) {
             // Sender sees "Pending" status

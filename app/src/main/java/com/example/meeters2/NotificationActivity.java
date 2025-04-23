@@ -110,7 +110,7 @@ public class NotificationActivity extends BaseActivity {
             });
         }
     }
-    
+    /// Set up the swipe refresh layout to allow users to refresh the meeting requests
     private void setupSwipeRefresh() {
         if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setOnRefreshListener(this::loadMeetingRequests);
@@ -175,6 +175,9 @@ public class NotificationActivity extends BaseActivity {
         sentRequestRecyclerView.setAdapter(sentRequestAdapter);
     }
 
+    
+    // Load meeting requests from Firestore
+    // This method fetches meeting requests where the user is either the sender or receiver
     private void loadMeetingRequests() {
         swipeRefreshLayout.setRefreshing(true);
 

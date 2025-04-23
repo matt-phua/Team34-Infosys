@@ -48,6 +48,8 @@ public class NearbyUserAdapter extends RecyclerView.Adapter<NearbyUserAdapter.Vi
         return new ViewHolder(view);
     }
 
+    // Bind data to the views in the ViewHolder
+    // This method is called for each item in the RecyclerView
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         NearbyUser user = userList.get(position);
@@ -80,6 +82,8 @@ public class NearbyUserAdapter extends RecyclerView.Adapter<NearbyUserAdapter.Vi
         });
     }
 
+    // Show a dialog to send a meeting request to the selected user
+    // This method is called when the user clicks the "Connect" button on a nearby user
     private void showMeetingRequestDialog(NearbyUser user) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Send Meeting Request");
@@ -101,6 +105,8 @@ public class NearbyUserAdapter extends RecyclerView.Adapter<NearbyUserAdapter.Vi
         builder.show();
     }
 
+    // Send a meeting request to the selected user
+    // This method is called when the user clicks "Send" in the meeting request dialog
     private void sendMeetingRequest(NearbyUser receiver, String message) {
         String currentUserId = mAuth.getCurrentUser().getUid();
         
