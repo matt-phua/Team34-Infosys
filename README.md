@@ -7,12 +7,12 @@ Welcome to **Meeters**, a real-time, location-based Android app designed to help
 ---
 ## 👥 Team Members
 
-**SUTD - Team 34**
-Lim Han Yang   
-Htet Myat Ko Ko
-Matthew Phua Tai Kit
-Chong Zhi Kai
-Desmond Ngui You Hong
+- **Lim Han Yang** 
+- **Htet Myat Ko Ko** 
+- **Matthew Phua Tai Kit**
+- **Chong Zhi Kai** 
+- **Desmond Ngui You Hong**
+
 
 ---
 
