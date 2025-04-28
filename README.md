@@ -5,6 +5,16 @@ SUTD 50.001 Information Systems & Programming 2025 - Team 34 1D Project
 Welcome to **Meeters**, a real-time, location-based Android app designed to help people connect and meet new friends easily, especially in unfamiliar environments like a new school or workplace. Developed as part of the 50.001 1D project at SUTD by Team 34, this app fosters spontaneous and genuine social interactions using Google Maps and Firebase technologies.
 
 ---
+## 👥 Team Members
+
+**SUTD - Team 34**
+| Lim Han Yang   
+| Htet Myat Ko Ko
+| Matthew Phua Tai Kit
+| Chong Zhi Kai
+| Desmond Ngui You Hong
+
+---
 
 ## 📱 App Overview
 
